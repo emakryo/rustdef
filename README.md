@@ -14,8 +14,8 @@ This extension is built on [PyO3](https://github.com/PyO3/pyo3) and
 
 ### ToDo
 
-- [] numpy supports
-- [] dependency crate supports
-- [] class/module supports
-- [] customizable module name
-- [] verbose flag
+- [ ] numpy view supports
+- [ ] dependency crate version
+- [ ] class/module supports
+- [ ] customizable module name
+- [ ] verbose flag
