@@ -95,6 +95,8 @@ Ok(())
         if not self.exists_wheel(mod_name):
             print("Building..")
             self.build(mod_name)
+        else:
+            print("Use previous build")
 
         with self.installed(mod_name):
             exec_line = f"from {mod_name} import {','.join(exported_functions)}"

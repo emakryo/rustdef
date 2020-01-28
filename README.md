@@ -8,14 +8,16 @@ This extension is built on [PyO3](https://github.com/PyO3/pyo3) and
 
 ## Examples
 
-- [Simple example](exampels/simple.ipynb)
+- [Simple example](examples/simple.ipynb)
+- [Numpy example](examples/numpy.ipynb)
 
 ## Develop
 
 ### ToDo
 
-- [ ] numpy view supports
 - [ ] dependency crate version
+- [ ] print function
 - [ ] class/module supports
 - [ ] customizable module name
 - [ ] verbose flag
+- [ ] syntax highlight

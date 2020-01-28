@@ -1,117 +1,104 @@
-use pyo3::{FromPy, PyObject, Python, IntoPy, FromPyObject, types::PyAny, PyResult};
-use ndarray::ArrayD;
+use std::convert::TryFrom;
+use pyo3::{FromPy, PyObject, Python, IntoPy, FromPyObject, types::PyAny, PyResult, PyErr};
+use pyo3::exceptions::RuntimeError;
+use ndarray::{ArrayD, ArrayViewMutD, ArrayViewD};
 use numpy::{PyArray, TypeNum};
 
-/// Wrapper newtype for ArrayBase.
-/// Implement convenient conversions
+/// Wrapper type to connect ndarray in python and ndarray in rust .
+pub enum Numpy<'a, T>{
+    Mut(ArrayViewMutD<'a, T>),
+    View(ArrayViewD<'a, T>),
+    Own(ArrayD<T>),
+}
 
-pub struct Numpy<T>(pub ArrayD<T>);
-
-impl<T: TypeNum> FromPy<Numpy<T>> for PyObject {
-    fn from_py(other: Numpy<T>, py: Python) -> PyObject {
-        let a = PyArray::from_array(py, &other.0);
+impl<'a, T: TypeNum> FromPy<Numpy<'a, T>> for PyObject {
+    fn from_py(other: Numpy<'a, T>, py: Python) -> PyObject {
+        let a = match other {
+            Numpy::Mut(a) => PyArray::from_array(py, &a),
+            Numpy::View(a) => PyArray::from_array(py, &a),
+            Numpy::Own(a) => PyArray::from_owned_array(py, a),
+        };
         a.into_py(py)
     }
 }
 
-impl<T: TypeNum> From<Numpy<T>> for ArrayD<T> {
-    fn from(x: Numpy<T>) -> ArrayD<T> {
-        x.0
+impl<'a, T: TypeNum> TryFrom<Numpy<'a, T>> for ArrayViewMutD<'a, T> {
+    type Error = PyErr;
+    fn try_from(x: Numpy<'a, T>) -> Result<Self, Self::Error> {
+        x.as_mut_array()
     }
 }
 
-impl<T: TypeNum> Numpy<T> {
-    pub fn as_array(&self) -> &ArrayD<T> {
-        &self.0
-    }
-    pub fn into_array(self) -> ArrayD<T> {
-        self.0
+impl<'a, T: TypeNum> From<&'a Numpy<'a, T>> for ArrayViewD<'a, T> {
+    fn from(x: &'a Numpy<'a, T>) -> Self {
+        x.as_array()
     }
 }
 
-impl<'a, T: TypeNum+Clone> FromPyObject<'a> for Numpy<T> {
+impl<'a, T: TypeNum> Numpy<'a, T> {
+    /// Convert Numpy array to mutable array.
+    /// If this is not a function argument, this call raise an RuntimeError
+    pub fn as_mut_array(self) -> PyResult<ArrayViewMutD<'a, T>> {
+        match self {
+            Numpy::Mut(a) => Ok(a),
+            Numpy::View(_) => RuntimeError::into("Immutable array"),
+            Numpy::Own(_) => RuntimeError::into("Live too short"),
+        }
+    }
+    /// Convert Numpy array to immutable array reference.
+    pub fn as_array(&'a self) -> ArrayViewD<'a, T> {
+        match self {
+            Numpy::Mut(a) => a.view(),
+            Numpy::View(a) => a.view(),
+            Numpy::Own(a) => a.view(),
+        }
+    }
+}
+
+impl<'a, T: TypeNum + Clone> Numpy<'a, T> {
+    /// Convert Numpy array to owned array.
+    pub fn to_array(&self) -> ArrayD<T> {
+        match self {
+            Numpy::Mut(a) => a.view().to_owned(),
+            Numpy::View(a) => a.to_owned(),
+            Numpy::Own(a) => a.clone(),
+        }
+    }
+}
+
+impl<'a, T: TypeNum> FromPyObject<'a> for Numpy<'a, T> {
     fn extract(obj: &'a PyAny) -> PyResult<Self> {
         let a: &PyArray<_, _> = FromPyObject::extract(obj)?;
-        Ok(Numpy(a.to_owned_array()))
+        Ok(Numpy::Mut(a.as_array_mut()))
     }
 }
 
-//pyobject_native_type_convert!(
-//    Numpy<T>,
-//    *npyffi::PY_ARRAY_API.get_type_object(npyffi::ArrayType::PyArray_Type),
-//    Some("numpy"),
-//    npyffi::PyArray_Check,
-//    T
-//);
-//
-//pyobject_native_type_named!(Numpy<T>, T);
+impl<'a, T: TypeNum> From<ArrayD<T>> for Numpy<'a, T> {
+    fn from(x: ArrayD<T>) -> Self {
+        Numpy::Own(x)
+    }
+}
 
-//impl<T> ::pyo3::type_object::PyTypeInfo for Numpy<T> {
-//    type Type = ();
-//    type BaseType = ::pyo3::types::PyAny;
-//    const NAME: &'static str = "Numpy<T>";
-//    const MODULE: Option<&'static str> = Some("numpy");
-//    const SIZE: usize = ::std::mem::size_of::<::pyo3::ffi::PyObject>();
-//    const OFFSET: isize = 0;
-//    #[inline]
-//    unsafe fn type_object() -> &'static mut ::pyo3::ffi::PyTypeObject {
-//        &mut *npyffi::PY_ARRAY_API.get_type_object(npyffi::ArrayType::PyArray_Type)
-//    }
-//    #[allow(unused_unsafe)]
-//    fn is_instance(ptr: &::pyo3::types::PyAny) -> bool {
-//        use ::pyo3::AsPyPointer;
-//        unsafe { npyffi::PyArray_Check(ptr.as_ptr()) > 0 }
-//    }
-//}
-//impl<T> ::pyo3::type_object::PyObjectAlloc for Numpy<T> {}
-//unsafe impl<T> ::pyo3::type_object::PyTypeObject for Numpy<T> {
-//    fn init_type() -> std::ptr::NonNull<::pyo3::ffi::PyTypeObject> {
-//        unsafe {
-//            std::ptr::NonNull::new_unchecked(
-//                <Self as ::pyo3::type_object::PyTypeInfo>::type_object() as *mut _,
-//            )
-//        }
-//    }
-//}
-////impl<T> ::pyo3::ToPyObject for Numpy<T> {
-////    #[inline]
-////    fn to_object(&self, py: ::pyo3::Python) -> ::pyo3::PyObject {
-////        use ::pyo3::AsPyPointer;
-////        self.into_py(py)
-////    }
-////}
-//impl<T> ::std::fmt::Debug for Numpy<T> {
-//    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-//        use ::pyo3::ObjectProtocol;
-//        let s = self.repr().map_err(|_| ::std::fmt::Error)?;
-//        f.write_str(&s.to_string_lossy())
-//    }
-//}
-//impl<T> ::std::fmt::Display for Numpy<T> {
-//    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-//        use ::pyo3::ObjectProtocol;
-//        let s = self.str().map_err(|_| ::std::fmt::Error)?;
-//        f.write_str(&s.to_string_lossy())
-//    }
-//}
-//impl<T> ::std::convert::AsRef<::pyo3::types::PyAny> for Numpy<T> {
-//    #[inline]
-//    fn as_ref(&self) -> &::pyo3::types::PyAny {
-//        unsafe { &*(self as *const Numpy<T> as *const ::pyo3::types::PyAny) }
-//    }
-//}
-//unsafe impl<T> ::pyo3::PyNativeType for Numpy<T> {}
-////impl<T> ::pyo3::AsPyPointer for Numpy<T> {
-////    /// Gets the underlying FFI pointer, returns a borrowed pointer.
-////    #[inline]
-////    fn as_ptr(&self) -> *mut ::pyo3::ffi::PyObject {
-////        self.0.as_ptr()
-////    }
-////}
-//impl<T> PartialEq for Numpy<T> {
-//    #[inline]
-//    fn eq(&self, o: &Numpy<T>) -> bool {
-//        use ::pyo3::AsPyPointer;
-//        self.as_ptr() == o.as_ptr()
-//    }
-//}
+impl<'a, T: TypeNum> From<&'a ArrayD<T>> for Numpy<'a, T> {
+    fn from(x: &'a ArrayD<T>) -> Self {
+        Numpy::View(x.view())
+    }
+}
+
+impl<'a, T: TypeNum> From<&'a mut ArrayD<T>> for Numpy<'a, T> {
+    fn from(x: &'a mut ArrayD<T>) -> Self {
+        Numpy::Mut(x.view_mut())
+    }
+}
+
+impl<'a, T: TypeNum> From<ArrayViewMutD<'a, T>> for Numpy<'a, T> {
+    fn from(x: ArrayViewMutD<'a, T>) -> Self {
+        Numpy::Mut(x)
+    }
+}
+
+impl<'a, T: TypeNum> From<ArrayViewD<'a, T>> for Numpy<'a, T> {
+    fn from(x: ArrayViewD<'a, T>) -> Self {
+        Numpy::View(x)
+    }
+}
