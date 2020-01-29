@@ -47,11 +47,15 @@ rustflags = [
 ]
 """
     lib_tpl = """
+use std::io::Write;
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
+use rustdef::PyWrite;
 #[pymodule]
-fn {}(_py: Python, m: &PyModule) -> PyResult<()> {{
+fn {}(py: Python, m: &PyModule) -> PyResult<()> {{
 {}
+let mut writer = PyWrite::new(py);
+writeln!(&mut writer, "register functions");
 Ok(())
 }}
 

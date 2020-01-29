@@ -1,6 +1,9 @@
 pub mod array;
 pub use array::Numpy;
 
+pub mod io;
+pub use io::PyWrite;
+
 use syn;
 use quote::{quote, format_ident};
 use pyo3::prelude::*;
