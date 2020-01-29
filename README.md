@@ -11,12 +11,29 @@ This extension is built on [PyO3](https://github.com/PyO3/pyo3) and
 - [Simple example](examples/simple.ipynb)
 - [Numpy example](examples/numpy.ipynb)
 
+## Magic command
+
+Add dependencies
+```
+%rustdef depends CRATE...
+```
+
+Define rust functions
+```
+%%rustdef
+#[pyfunction]
+fn my_func(x: i64, y: &'str) -> i64 {
+    println!("{}", y);
+    x + y.len()
+}
+```
 ## Develop
 
 ### ToDo
 
+- [ ] display useful parse error message
+- [ ] multithread safety (especially for println)
 - [ ] dependency crate version
-- [ ] print function
 - [ ] class/module supports
 - [ ] customizable module name
 - [ ] verbose flag

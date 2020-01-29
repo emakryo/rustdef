@@ -8,12 +8,21 @@ from hashlib import sha1
 import toml
 from .rustdef import export_names, process_src  # rust functions
 
-parser = ArgumentParser()
 
-subparser = parser.add_subparsers()
-depends_parser = subparser.add_parser('depends')
-depends_parser.set_defaults(command="depends")
-depends_parser.add_argument('crates', nargs='+')
+def line_macic_perser():
+    parser = ArgumentParser()
+
+    subparser = parser.add_subparsers()
+    depends_parser = subparser.add_parser('depends')
+    depends_parser.set_defaults(command="depends")
+    depends_parser.add_argument('crates', nargs='+')
+    return parser
+
+
+def cell_magic_parser():
+    parser = ArgumentParser()
+    parser.add_argument('--force-rebuild', action='store_true')
+    return parser
 
 
 class RustdefMagic:
@@ -33,6 +42,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 {}
+# rustdef = "0.1.0"
 rustdef = {{ path = "/Users/ryosuke.kamesawa/Develop/rustdef" }} # TODO: udpate here when released 
 
 [dependencies.pyo3]
@@ -47,15 +57,26 @@ rustflags = [
 ]
 """
     lib_tpl = """
+#![allow(unused)]
 use std::io::Write;
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 use rustdef::PyWrite;
+
+macro_rules! println {{
+    () => {{
+        println!("");
+    }};
+    ($($arg:tt)*) => {{
+        let py = unsafe {{ Python::assume_gil_acquired() }};
+        let mut writer = PyWrite::new(py);
+        writeln!(writer, $($arg)*).unwrap();
+    }};
+}}
+
 #[pymodule]
-fn {}(py: Python, m: &PyModule) -> PyResult<()> {{
+fn {}(_py: Python, m: &PyModule) -> PyResult<()> {{
 {}
-let mut writer = PyWrite::new(py);
-writeln!(&mut writer, "register functions");
 Ok(())
 }}
 
@@ -64,6 +85,8 @@ Ok(())
 
     def __init__(self, ipython):
         self.ipython = ipython
+        self.line_parser = line_macic_perser()
+        self.cell_parser = cell_magic_parser()
         self.mod_names = []
         self.dependencies = {}
         self.root = Path.cwd() / ".rustdef"
@@ -78,7 +101,7 @@ Ok(())
             self.run(line, cell)
 
     def command(self, line):
-        args = parser.parse_args(line.split())
+        args = self.line_parser.parse_args(line.split())
         if args.command == "depends":
             self.add_dependencies(args.crates)
 
@@ -92,11 +115,12 @@ Ok(())
 
     def run(self, line, cell):
         mod_name, exported_functions = self.add_src(cell)
+        args = self.cell_parser.parse_args(line.split())
 
         new_mod_names = self.mod_names + [mod_name]
         self.update_workspace(new_mod_names)
 
-        if not self.exists_wheel(mod_name):
+        if args.force_rebuild or not self.exists_wheel(mod_name):
             print("Building..")
             self.build(mod_name)
         else:
@@ -153,7 +177,7 @@ Ok(())
             raise RuntimeError("wheel installation failed")
 
     def uninstall(self, mod_name):
-        ret = subprocess.run(f"pip uninstall -y {mod_name.replace('_', '-')}".split())
+        ret = subprocess.run(f"pip uninstall -qy {mod_name.replace('_', '-')}".split())
         if ret.returncode != 0:
             print("uninstallation failed")
             raise RuntimeError("wheel uninsallation failed")
