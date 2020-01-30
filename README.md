@@ -22,17 +22,15 @@ Define rust functions
 ```
 %%rustdef
 #[pyfunction]
-fn my_func(x: i64, y: &'str) -> i64 {
+fn my_func(x: i64, y: &str) -> i64 {
     println!("{}", y);
-    x + y.len()
+    x + y.len() as i64
 }
 ```
 ## Develop
 
 ### ToDo
 
-- [ ] display useful parse error message
-- [ ] multithread safety (especially for println)
 - [ ] dependency crate version
 - [ ] class/module supports
 - [ ] customizable module name

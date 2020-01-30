@@ -1,9 +1,13 @@
 import os
+import select
 import subprocess
+import sys
+import threading
 from argparse import ArgumentParser
 from contextlib import contextmanager
 from pathlib import Path
 from hashlib import sha1
+from IPython import get_ipython
 
 import toml
 from .rustdef import export_names, process_src  # rust functions
@@ -23,6 +27,64 @@ def cell_magic_parser():
     parser = ArgumentParser()
     parser.add_argument('--force-rebuild', action='store_true')
     return parser
+
+
+class BuildError(Exception):
+    def __init__(self):
+        ...
+
+    def _render_traceback_(self):
+        return []
+
+
+showtraceback = None
+
+
+def exception_handler(exc_tuple=None, filename=None, tb_offset=None, exception_only=False, running_compiled_code=False):
+    ipython = get_ipython()
+    print(ipython.get_exception_only())
+    ipython.showtraceback = showtraceback
+
+
+def wrap(func):
+    def wrapper(*args, **kwargs):
+        stdout_backup = os.dup(1)
+        r, w = os.pipe()
+        os.close(1)
+        os.dup2(w, 1)
+        os.close(w)
+
+        finish = threading.Event()
+        finish.clear()
+
+        def redirect():
+            while True:
+                rs, _, _ = select.select([r], [], [])
+
+                while True:
+                    buf = os.read(rs[0], 1000)
+                    if len(buf) == 0:
+                        break
+                    print(buf.decode("utf-8"), end="")
+
+                if finish.wait(0):
+                    return
+
+        thread = threading.Thread(target=redirect)
+        thread.start()
+
+        get_ipython().showtraceback = exception_handler
+        ret = func(*args, **kwargs)
+        finish.set()
+
+        os.close(1)
+        os.dup2(stdout_backup, 1)
+        os.close(stdout_backup)
+
+        thread.join()
+        return ret
+
+    return wrapper
 
 
 class RustdefMagic:
@@ -57,22 +119,9 @@ rustflags = [
 ]
 """
     lib_tpl = """
-#![allow(unused)]
-use std::io::Write;
+// #![allow(unused)]
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
-use rustdef::PyWrite;
-
-macro_rules! println {{
-    () => {{
-        println!("");
-    }};
-    ($($arg:tt)*) => {{
-        let py = unsafe {{ Python::assume_gil_acquired() }};
-        let mut writer = PyWrite::new(py);
-        writeln!(writer, $($arg)*).unwrap();
-    }};
-}}
 
 #[pymodule]
 fn {}(_py: Python, m: &PyModule) -> PyResult<()> {{
@@ -84,6 +133,8 @@ Ok(())
 """
 
     def __init__(self, ipython):
+        global showtraceback
+        showtraceback = ipython.showtraceback
         self.ipython = ipython
         self.line_parser = line_macic_perser()
         self.cell_parser = cell_magic_parser()
@@ -114,7 +165,8 @@ Ok(())
                 self.dependencies[crate] = "*"
 
     def run(self, line, cell):
-        mod_name, exported_functions = self.add_src(cell)
+        mod_name = f"rustdef_cell_{sha1(bytes(cell, 'utf-8')).hexdigest()}"
+        exported_functions = self.add_src(mod_name, cell)
         args = self.cell_parser.parse_args(line.split())
 
         new_mod_names = self.mod_names + [mod_name]
@@ -131,11 +183,10 @@ Ok(())
             ls = {}
             gs = {}
             exec(exec_line, gs, ls)
-            self.ipython.push({fn: ls[fn] for fn in exported_functions})
+            self.ipython.push({fn: wrap(ls[fn]) for fn in exported_functions})
             self.mod_names = new_mod_names
 
-    def add_src(self, src):
-        mod_name = f"rustdef_cell_{sha1(bytes(src, 'utf-8')).hexdigest()}"
+    def add_src(self, mod_name, src):
         exported_functions = export_names(src)
 
         package_root = self.root / mod_name
@@ -150,7 +201,7 @@ Ok(())
         src = self.lib_tpl.format(mod_name, register_function, src)
         (package_root / f"src/lib.rs").write_text(src)
 
-        return mod_name, exported_functions
+        return exported_functions
 
     def update_workspace(self, mod_names):
         (self.root / "Cargo.toml").write_text(self.workspace_tpl.format(
@@ -163,11 +214,11 @@ Ok(())
     def build(self, mod_name):
         cwd = Path.cwd().resolve()
         os.chdir(self.root / mod_name)
-        self.ipython.system_piped("maturin build")
-
-        if self.ipython.user_ns['_exit_code'] != 0:
-            raise RuntimeError("build failed")
+        self.ipython.system_piped("maturin build --release")
+        exit_code = self.ipython.user_ns['_exit_code']
         os.chdir(str(cwd))
+        if exit_code != 0:
+            raise BuildError()
 
     def install(self, mod_name):
         wheel = [str(w) for w in self.root.glob(f"target/wheels/*{mod_name}*.whl")]

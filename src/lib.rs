@@ -1,9 +1,6 @@
 pub mod array;
 pub use array::Numpy;
 
-pub mod io;
-pub use io::PyWrite;
-
 use syn;
 use quote::{quote, format_ident};
 use pyo3::prelude::*;
@@ -35,9 +32,12 @@ fn is_pyfn(item: &syn::Item) -> bool {
 
 #[pyfunction]
 fn export_names(code: &str) -> PyResult<Vec<String>> {
-    let parsed: syn::File = syn::parse_str(code).map_err(|_| {
-        RuntimeError::py_err("Failed to parse code")
-    })?;
+    let parsed: syn::File = if let Ok(f) = syn::parse_str(code) {
+        f
+    } else {
+        return Ok(Vec::new());
+    };
+
     let names = parsed.items.iter().filter_map(|item| {
         if is_pyfunction(item) || is_pyfn(item) {
             if let syn::Item::Fn(itemfn) = item {
