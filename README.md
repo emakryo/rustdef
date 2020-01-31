@@ -31,8 +31,10 @@ fn my_func(x: i64, y: &str) -> i64 {
 
 ### ToDo
 
+- [ ] execute within rustdef cell
 - [ ] dependency crate version
 - [ ] class/module supports
 - [ ] customizable module name
 - [ ] verbose flag
 - [ ] syntax highlight
+- [ ] serde support

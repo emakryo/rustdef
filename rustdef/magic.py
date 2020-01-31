@@ -1,31 +1,32 @@
 import os
 import select
 import subprocess
-import sys
 import threading
 from argparse import ArgumentParser
 from contextlib import contextmanager
-from pathlib import Path
 from hashlib import sha1
-from IPython import get_ipython
+from pathlib import Path
 
 import toml
-from .rustdef import export_names, process_src  # rust functions
+from IPython import get_ipython
+
+from . import __version__
+from .rustdef import export_names  # rust functions
 
 
-def line_macic_perser():
+def line_macic_parser():
     parser = ArgumentParser()
 
     subparser = parser.add_subparsers()
-    depends_parser = subparser.add_parser('depends')
+    depends_parser = subparser.add_parser("depends")
     depends_parser.set_defaults(command="depends")
-    depends_parser.add_argument('crates', nargs='+')
+    depends_parser.add_argument("crates", nargs="+")
     return parser
 
 
 def cell_magic_parser():
     parser = ArgumentParser()
-    parser.add_argument('--force-rebuild', action='store_true')
+    parser.add_argument("--force-rebuild", action="store_true")
     return parser
 
 
@@ -40,7 +41,13 @@ class BuildError(Exception):
 showtraceback = None
 
 
-def exception_handler(exc_tuple=None, filename=None, tb_offset=None, exception_only=False, running_compiled_code=False):
+def exception_handler(
+    exc_tuple=None,
+    filename=None,
+    tb_offset=None,
+    exception_only=False,
+    running_compiled_code=False,
+):
     ipython = get_ipython()
     print(ipython.get_exception_only())
     ipython.showtraceback = showtraceback
@@ -53,35 +60,34 @@ def wrap(func):
         os.close(1)
         os.dup2(w, 1)
         os.close(w)
-
-        finish = threading.Event()
-        finish.clear()
+        r2, w2 = os.pipe()
 
         def redirect():
             while True:
-                rs, _, _ = select.select([r], [], [])
+                rs, _, _ = select.select([r, r2], [], [])
 
-                while True:
-                    buf = os.read(rs[0], 1000)
-                    if len(buf) == 0:
-                        break
+                if r in rs:
+                    buf = os.read(r, 1000)
                     print(buf.decode("utf-8"), end="")
 
-                if finish.wait(0):
-                    return
+                if r2 in rs:
+                    break
 
         thread = threading.Thread(target=redirect)
         thread.start()
 
         get_ipython().showtraceback = exception_handler
         ret = func(*args, **kwargs)
-        finish.set()
+        os.write(w2, b"x")
 
+        thread.join()
         os.close(1)
         os.dup2(stdout_backup, 1)
         os.close(stdout_backup)
 
-        thread.join()
+        os.close(r2)
+        os.close(w2)
+
         return ret
 
     return wrapper
@@ -104,8 +110,9 @@ crate-type = ["cdylib"]
 
 [dependencies]
 {}
-# rustdef = "0.1.0"
-rustdef = {{ path = "/Users/ryosuke.kamesawa/Develop/rustdef" }} # TODO: udpate here when released 
+# TODO: udpate here when released
+# rustdef = {}
+rustdef = {{ path = "/Users/ryosuke.kamesawa/Develop/rustdef" }}
 
 [dependencies.pyo3]
 version = "0.8"
@@ -136,7 +143,7 @@ Ok(())
         global showtraceback
         showtraceback = ipython.showtraceback
         self.ipython = ipython
-        self.line_parser = line_macic_perser()
+        self.line_parser = line_macic_parser()
         self.cell_parser = cell_magic_parser()
         self.mod_names = []
         self.dependencies = {}
@@ -160,7 +167,7 @@ Ok(())
         for crate in crates:
             if "==" in crate:
                 sep_idx = crate.index("==")
-                self.dependencies[crate[:sep_idx]] = crate[sep_idx+2:]
+                self.dependencies[crate[:sep_idx]] = crate[sep_idx + 2:]
             else:
                 self.dependencies[crate] = "*"
 
@@ -179,7 +186,8 @@ Ok(())
             print("Use previous build")
 
         with self.installed(mod_name):
-            exec_line = f"from {mod_name} import {','.join(exported_functions)}"
+            functions = ",".join(exported_functions)
+            exec_line = f"from {mod_name} import {functions}"
             ls = {}
             gs = {}
             exec(exec_line, gs, ls)
@@ -191,12 +199,19 @@ Ok(())
 
         package_root = self.root / mod_name
         package_root.mkdir(exist_ok=True)
-        (package_root / "Cargo.toml").write_text(self.cargo_tpl.format(mod_name, toml.dumps(self.dependencies)))
+        (package_root / "Cargo.toml").write_text(
+            self.cargo_tpl.format(
+                mod_name, toml.dumps(self.dependencies), __version__
+            )
+        )
         (package_root / "src").mkdir(exist_ok=True)
 
-        register_function = "\n".join([
-            f"m.add_wrapped(wrap_pyfunction!({fname}))?;" for fname in exported_functions
-        ])
+        register_function = "\n".join(
+            [
+                f"m.add_wrapped(wrap_pyfunction!({fname}))?;"
+                for fname in exported_functions
+            ]
+        )
 
         src = self.lib_tpl.format(mod_name, register_function, src)
         (package_root / f"src/lib.rs").write_text(src)
@@ -204,8 +219,11 @@ Ok(())
         return exported_functions
 
     def update_workspace(self, mod_names):
-        (self.root / "Cargo.toml").write_text(self.workspace_tpl.format(
-            "[" + ",".join([f'"{p}"' for p in mod_names]) + "]"))
+        (self.root / "Cargo.toml").write_text(
+            self.workspace_tpl.format(
+                "[" + ",".join([f'"{p}"' for p in mod_names]) + "]"
+            )
+        )
 
     def exists_wheel(self, mod_name):
         wheel = list(self.root.glob(f"target/wheels/*{mod_name}*.whl"))
@@ -215,20 +233,23 @@ Ok(())
         cwd = Path.cwd().resolve()
         os.chdir(self.root / mod_name)
         self.ipython.system_piped("maturin build --release")
-        exit_code = self.ipython.user_ns['_exit_code']
+        exit_code = self.ipython.user_ns["_exit_code"]
         os.chdir(str(cwd))
         if exit_code != 0:
             raise BuildError()
 
     def install(self, mod_name):
-        wheel = [str(w) for w in self.root.glob(f"target/wheels/*{mod_name}*.whl")]
+        wheel = list(
+            map(str, self.root.glob(f"target/wheels/*{mod_name}*.whl"))
+        )
         ret = subprocess.run("pip install".split() + wheel)
         if ret.returncode != 0:
             print("installation failed")
             raise RuntimeError("wheel installation failed")
 
     def uninstall(self, mod_name):
-        ret = subprocess.run(f"pip uninstall -qy {mod_name.replace('_', '-')}".split())
+        mod_name_kebab = mod_name.replace("_", "-")
+        ret = subprocess.run(f"pip uninstall -qy {mod_name_kebab}".split())
         if ret.returncode != 0:
             print("uninstallation failed")
             raise RuntimeError("wheel uninsallation failed")
