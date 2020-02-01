@@ -1,5 +1,7 @@
 # rustdef
 
+![](https://github.com/emakryo/rustdef/workflows/CI/badge.svg)
+
 Jupyter extension for jupyter notebook and rust user.
 
 Define functions in rust and then run as python funcions.
