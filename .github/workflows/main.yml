@@ -50,5 +50,5 @@ jobs:
     - name: Install wheel
       run: pip install target/wheels/rustdef-*${{ matrix.python-name }}*.whl
     - name: Execute examples
-      run: jupyter-nbconvert --execute *.ipynb
+      run: jupyter-nbconvert --ExecutePreprocessor.timeout=-1 --execute *.ipynb
       working-directory: examples
