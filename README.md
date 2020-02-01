@@ -33,18 +33,27 @@ fn my_func(x: i64, y: &str) -> i64 {
 
 ### How it works?
 
-Roughly, definitions in rustdef are available in python with following steps.
+Roughly, definitions in rustdef are available in python after the following steps.
 
 1. Each rustdef magic cell is populated with module definition of pyo3
-2. A new member in cargo workspace is generated for each rustdef cell
-3. The member crate is compiled into a python wheel by `maturin`
-4. Install the wheel
-5. Functions with `#[pyfunction]` attributes are exported into interpreter name space
+2. A new crate is generated for the rustdef cell 
+3. The crate is compiled into a python wheel by `maturin`
+4. Install the wheel with pip
+5. Functions with `#[pyfunction]` attributes are exported into interpreter name space in notebook
 6. Ready to call the function in jupyter!
+
+### Build
+
+`maturin` is required.
+
+```shell script
+$ pip install maturin
+$ maturin build
+$ pip install target/wheels/rustdef-{version}-{python}-{platform}.whl
+```
 
 ### ToDo
 
-- [ ] setup CI
 - [ ] execute within rustdef cell
 - [ ] dependency crate version
 - [ ] class/module supports
