@@ -241,7 +241,7 @@ Ok(())
 
     def install(self, mod_name):
         for wheel in self.root.glob(f"target/wheels/*{mod_name}*.whl"):
-            ret = subprocess.run(f"python -m pip install {wheel}".split())
+            ret = subprocess.run(f"python -m pip install --user {wheel}".split())
             if ret.returncode != 0:
                 print("ignore", str(wheel))
             else:
