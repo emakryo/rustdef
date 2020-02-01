@@ -34,6 +34,8 @@ jobs:
     - name: Python Syntax Checker
       uses: cclauss/Find-Python-syntax-errors-action@v0.2.0
     - name: Install build dependencies
-      run: pip install maturin
+      run: pip install maturin jupyter
     - name: Build wheel
       run: maturin build
+    - name: Execute examples
+      run: jupyter-nbconvert --execute examples/*.ipynb
