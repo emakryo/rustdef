@@ -1,11 +1,11 @@
-use std::convert::TryFrom;
-use pyo3::{FromPy, PyObject, Python, IntoPy, FromPyObject, types::PyAny, PyResult, PyErr};
-use pyo3::exceptions::RuntimeError;
-use ndarray::{ArrayD, ArrayViewMutD, ArrayViewD};
+use ndarray::{ArrayD, ArrayViewD, ArrayViewMutD};
 use numpy::{PyArray, TypeNum};
+use pyo3::exceptions::RuntimeError;
+use pyo3::{types::PyAny, FromPy, FromPyObject, IntoPy, PyErr, PyObject, PyResult, Python};
+use std::convert::TryFrom;
 
 /// Wrapper type to connect ndarray in python and ndarray in rust .
-pub enum Numpy<'a, T>{
+pub enum Numpy<'a, T> {
     Mut(ArrayViewMutD<'a, T>),
     View(ArrayViewD<'a, T>),
     Own(ArrayD<T>),

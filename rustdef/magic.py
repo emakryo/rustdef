@@ -11,7 +11,7 @@ import toml
 from IPython import get_ipython
 
 from . import __version__
-from .rustdef import export_names  # rust functions
+from .rustdef import export_names, prepare_self  # rust functions
 
 
 def line_macic_parser():
@@ -110,9 +110,11 @@ crate-type = ["cdylib"]
 
 [dependencies]
 {}
-# TODO: udpate here when released
-# rustdef = {}
-rustdef = {{ path = "/Users/ryosuke.kamesawa/Develop/rustdef" }}
+
+[dependencies.rustdef]
+ path = "../rustdef"
+ default-features = false
+ features = ["numpy-bridge"]
 
 [dependencies.pyo3]
 version = "0.8"
@@ -151,6 +153,7 @@ Ok(())
         self.root.mkdir(exist_ok=True)
         (self.root / ".cargo").mkdir(exist_ok=True)
         (self.root / ".cargo/config").write_text(self.config)
+        prepare_self(str(self.root))
 
     def invoke(self, line, cell=None):
         if cell is None:
@@ -167,7 +170,7 @@ Ok(())
         for crate in crates:
             if "==" in crate:
                 sep_idx = crate.index("==")
-                self.dependencies[crate[:sep_idx]] = crate[sep_idx + 2:]
+                self.dependencies[crate[:sep_idx]] = crate[sep_idx + 2 :]
             else:
                 self.dependencies[crate] = "*"
 

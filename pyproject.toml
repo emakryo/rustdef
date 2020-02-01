@@ -1,0 +1,6 @@
+[build-system]
+requires = ["maturin"]
+build-backend = "maturin"
+
+[package.metadata.maturin]
+requires-dist = ["jupyter"]
