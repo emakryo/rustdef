@@ -241,7 +241,7 @@ Ok(())
 
     def install(self, mod_name):
         for wheel in self.root.glob(f"target/wheels/*{mod_name}*.whl"):
-            ret = subprocess.run(["pip", "install", str(wheel)])
+            ret = subprocess.run(f"python -m pip install {wheel}".split())
             if ret.returncode != 0:
                 print("ignore", str(wheel))
             else:
@@ -251,7 +251,7 @@ Ok(())
 
     def uninstall(self, mod_name):
         mod_name_kebab = mod_name.replace("_", "-")
-        ret = subprocess.run(f"pip uninstall -qy {mod_name_kebab}".split())
+        ret = subprocess.run(f"python -m pip uninstall -qy {mod_name_kebab}".split())
         if ret.returncode != 0:
             print("uninstallation failed")
             raise RuntimeError("wheel uninsallation failed")
