@@ -44,7 +44,9 @@ jobs:
         maturin build
         ls target/wheels
     - name: Install wheel
+      shell: bash
       run: pip install target/wheels/rustdef-*${{ matrix.python-name }}*.whl
     - name: Execute examples
+      shell: bash
       run: jupyter-nbconvert --ExecutePreprocessor.timeout=-1 --execute *.ipynb
       working-directory: examples
