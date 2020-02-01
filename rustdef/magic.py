@@ -242,13 +242,14 @@ Ok(())
             raise BuildError()
 
     def install(self, mod_name):
-        wheel = list(
-            map(str, self.root.glob(f"target/wheels/*{mod_name}*.whl"))
-        )
-        ret = subprocess.run("pip install".split() + wheel)
-        if ret.returncode != 0:
-            print("installation failed")
-            raise RuntimeError("wheel installation failed")
+        for wheel in self.root.glob(f"target/wheels/*{mod_name}*.whl"):
+            ret = subprocess.run(["pip", "install", str(wheel)])
+            if ret.returncode != 0:
+                print("ignore", str(wheel))
+            else:
+                return
+
+        raise RuntimeError("wheel installation failed")
 
     def uninstall(self, mod_name):
         mod_name_kebab = mod_name.replace("_", "-")
