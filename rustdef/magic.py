@@ -203,9 +203,7 @@ Ok(())
         package_root = self.root / mod_name
         package_root.mkdir(exist_ok=True)
         (package_root / "Cargo.toml").write_text(
-            self.cargo_tpl.format(
-                mod_name, toml.dumps(self.dependencies), __version__
-            )
+            self.cargo_tpl.format(mod_name, toml.dumps(self.dependencies), __version__)
         )
         (package_root / "src").mkdir(exist_ok=True)
 
