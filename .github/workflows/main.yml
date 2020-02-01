@@ -35,3 +35,5 @@ jobs:
       uses: cclauss/Find-Python-syntax-errors-action@v0.2.0
     - name: Install build dependencies
       run: pip install maturin
+    - name: Build wheel
+      run: maturin build
