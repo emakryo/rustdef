@@ -55,8 +55,12 @@ jobs:
         ls "C:\\Users"
         ls "C:\\Users\\RUNNER~1"
         ls "C:\\Users\\RUNNER~1\\AppData"
+        ls -l "C:\\Users\\RUNNER~1\\AppData"
         ls "C:\\Users\\RUNNER~1\\AppData\\Local"
+        ls -l "C:\\Users\\RUNNER~1\\AppData\\Local"
         ls "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp"
-        ls "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\pip-uninstall-*"
+        ls -l "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp"
+        ls C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\pip-uninstall-*
+        ls -l C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\pip-uninstall-*
       shell: bash
       if: always()
