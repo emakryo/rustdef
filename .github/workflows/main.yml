@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
         python: [3.7, 3.8]
         include:
           - python: 3.7
@@ -50,17 +50,3 @@ jobs:
       shell: bash
       run: jupyter-nbconvert --ExecutePreprocessor.timeout=-1 --execute *.ipynb
       working-directory: examples
-    - name: foo
-      run: |
-        ls "C:\\Users"
-        ls "C:\\Users\\RUNNER~1"
-        ls "C:\\Users\\RUNNER~1\\AppData"
-        ls -l "C:\\Users\\RUNNER~1\\AppData"
-        ls "C:\\Users\\RUNNER~1\\AppData\\Local"
-        ls -l "C:\\Users\\RUNNER~1\\AppData\\Local"
-        ls "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp"
-        ls -l "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp"
-        ls C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\pip-uninstall-*
-        ls -l C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\pip-uninstall-*
-      shell: bash
-      if: always()
