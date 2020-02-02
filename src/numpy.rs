@@ -25,7 +25,7 @@ impl<'a, T: TypeNum> FromPy<Array<'a, T>> for PyObject {
 impl<'a, T: TypeNum> TryFrom<Array<'a, T>> for ArrayViewMutD<'a, T> {
     type Error = PyErr;
     fn try_from(x: Array<'a, T>) -> Result<Self, Self::Error> {
-        x.as_mut_array()
+        x.into_mut_array()
     }
 }
 
@@ -38,7 +38,7 @@ impl<'a, T: TypeNum> From<&'a Array<'a, T>> for ArrayViewD<'a, T> {
 impl<'a, T: TypeNum> Array<'a, T> {
     /// Convert Numpy array to mutable array.
     /// If this is not a function argument, this call raise an RuntimeError
-    pub fn as_mut_array(self) -> PyResult<ArrayViewMutD<'a, T>> {
+    pub fn into_mut_array(self) -> PyResult<ArrayViewMutD<'a, T>> {
         match self {
             Array::Mut(a) => Ok(a),
             Array::View(_) => RuntimeError::into("Immutable array"),
