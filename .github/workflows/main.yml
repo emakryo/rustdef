@@ -10,8 +10,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python: [3.7, 3.8]
+        python: [3.6, 3.7, 3.8]
         include:
+          - python: 3.6
+            python-name: cp36
           - python: 3.7
             python-name: cp37
           - python: 3.8
