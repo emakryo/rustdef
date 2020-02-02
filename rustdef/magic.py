@@ -149,7 +149,8 @@ Ok(())
 """
     js = """
 require(['notebook/js/codecell'], function(codecell) {
-    codecell.CodeCell.options_default.highlight_modes['text/x-rustsrc'] = {'reg':[/^%%rustdef/]} ;
+    codecell.CodeCell.options_default.highlight_modes['text/x-rustsrc']
+        = {'reg':[/^%%rustdef/]} ;
     Jupyter.notebook.events.one('kernel_ready.Kernel', function(){
         jupyter.notebook.get_cells().map(function(cell){
         if (cell.cell_type == 'code'){ cell.auto_highlight(); } }) ;

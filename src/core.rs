@@ -21,7 +21,7 @@ fn has_fuction_attribute(item: &syn::Item, attr: &str) -> bool {
 
     for a in itemfn.attrs.iter() {
         match a.path.get_ident().map(|t| t.to_string()) {
-            Some(x) if &x == attr => { return true; },
+            Some(x) if x == attr => { return true; },
             _ => ()
         }
     }

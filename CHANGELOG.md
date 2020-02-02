@@ -11,9 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Basic feature; define in rust, execute in python
 - Build caching
 - Numpy support
-- stdout redirection
+- Stdout/stderr redirection
 - Add samples
 - Custom crate dependency
+- Syntax highlighting
 
 ### Changed
 ### Deprecated
