@@ -50,6 +50,7 @@ jobs:
       shell: bash
       run: jupyter-nbconvert --ExecutePreprocessor.timeout=-1 --execute *.ipynb
       working-directory: examples
-    - name: uninstall
-      run: pip uninstall -y rustdef-cell-90ca76e0b1b4a717af6b5fc54e3b7d961fa54e7e
+    - name: foo
+      run: ls "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\pip-uninstall-*"
+      shell: bash
       if: always()
