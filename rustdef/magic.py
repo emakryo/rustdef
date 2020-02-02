@@ -9,6 +9,7 @@ from pathlib import Path
 
 import toml
 from IPython import get_ipython
+from IPython.display import display, Javascript
 
 from . import __version__
 from .rustdef import export_names, prepare_self  # rust functions
@@ -140,6 +141,15 @@ Ok(())
 
 {}
 """
+    js = """
+require(['notebook/js/codecell'], function(codecell) {
+    codecell.CodeCell.options_default.highlight_modes['text/x-rustsrc'] = {'reg':[/^%%rustdef/]} ;
+    Jupyter.notebook.events.one('kernel_ready.Kernel', function(){
+        jupyter.notebook.get_cells().map(function(cell){
+        if (cell.cell_type == 'code'){ cell.auto_highlight(); } }) ;
+    });
+});
+"""
 
     def __init__(self, ipython):
         global showtraceback
@@ -154,6 +164,8 @@ Ok(())
         (self.root / ".cargo").mkdir(exist_ok=True)
         (self.root / ".cargo/config").write_text(self.config)
         prepare_self(str(self.root))
+
+        display((Javascript(self.js),))
 
     def invoke(self, line, cell=None):
         if cell is None:

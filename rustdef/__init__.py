@@ -1,7 +1,6 @@
 __version__ = "0.1.0"
 __develop__ = True
 
-
 from .magic import RustdefMagic
 
 
