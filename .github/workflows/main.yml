@@ -38,7 +38,7 @@ jobs:
     - name: Install build dependencies
       run: pip install maturin jupyter numpy flake8 grpcio
     - name: foo
-      run: pip uninstall grpcio
+      run: pip uninstall -y grpcio
     - name: syntax check for python
       run: flake8
     - name: Build wheel
