@@ -57,7 +57,6 @@ fn prepare_self(package_root: &str) -> PyResult<()> {
     for i in 0..zipped.len() {
         let mut z = zipped.by_index(i).map_err(runtime_error)?;
         let name = path.join(z.sanitized_name());
-        println!("{:?}", name);
 
         if z.is_dir() {
             fs::create_dir_all(name)?;

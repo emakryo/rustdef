@@ -203,9 +203,7 @@ Ok(())
         package_root = self.root / mod_name
         package_root.mkdir(exist_ok=True)
         (package_root / "Cargo.toml").write_text(
-            self.cargo_tpl.format(
-                mod_name, toml.dumps(self.dependencies), __version__
-            )
+            self.cargo_tpl.format(mod_name, toml.dumps(self.dependencies), __version__)
         )
         (package_root / "src").mkdir(exist_ok=True)
 
@@ -242,17 +240,18 @@ Ok(())
             raise BuildError()
 
     def install(self, mod_name):
-        wheel = list(
-            map(str, self.root.glob(f"target/wheels/*{mod_name}*.whl"))
-        )
-        ret = subprocess.run("pip install".split() + wheel)
-        if ret.returncode != 0:
-            print("installation failed")
-            raise RuntimeError("wheel installation failed")
+        for wheel in self.root.glob(f"target/wheels/*{mod_name}*.whl"):
+            ret = subprocess.run(f"python -m pip install {wheel}".split())
+            if ret.returncode != 0:
+                print("ignore", str(wheel))
+            else:
+                return
+
+        raise RuntimeError("wheel installation failed")
 
     def uninstall(self, mod_name):
         mod_name_kebab = mod_name.replace("_", "-")
-        ret = subprocess.run(f"pip uninstall -qy {mod_name_kebab}".split())
+        ret = subprocess.run(f"python -m pip uninstall -qy {mod_name_kebab}".split())
         if ret.returncode != 0:
             print("uninstallation failed")
             raise RuntimeError("wheel uninsallation failed")

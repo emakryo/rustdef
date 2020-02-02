@@ -1,5 +1,5 @@
 #[cfg(feature = "numpy-bridge")]
-pub mod array;
+pub mod numpy;
 
 #[cfg(feature = "core")]
 pub mod core;
