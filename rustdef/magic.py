@@ -28,6 +28,7 @@ def line_macic_parser():
 def cell_magic_parser():
     parser = ArgumentParser()
     parser.add_argument("--force-rebuild", action="store_true")
+    parser.add_argument("--debug", action="store_true")
     return parser
 
 
@@ -57,9 +58,12 @@ def exception_handler(
 def wrap(func):
     def wrapper(*args, **kwargs):
         stdout_backup = os.dup(1)
+        stderr_backup = os.dup(2)
         r, w = os.pipe()
         os.close(1)
+        os.close(2)
         os.dup2(w, 1)
+        os.dup2(w, 2)
         os.close(w)
         r2, w2 = os.pipe()
 
@@ -85,6 +89,8 @@ def wrap(func):
         os.close(1)
         os.dup2(stdout_backup, 1)
         os.close(stdout_backup)
+        os.dup2(stderr_backup, 2)
+        os.close(stderr_backup)
 
         os.close(r2)
         os.close(w2)
@@ -165,7 +171,7 @@ require(['notebook/js/codecell'], function(codecell) {
         (self.root / ".cargo/config").write_text(self.config)
         prepare_self(str(self.root))
 
-        display((Javascript(self.js),))
+        display(Javascript(self.js))
 
     def invoke(self, line, cell=None):
         if cell is None:
@@ -196,7 +202,7 @@ require(['notebook/js/codecell'], function(codecell) {
 
         if args.force_rebuild or not self.exists_wheel(mod_name):
             print("Building..")
-            self.build(mod_name)
+            self.build(mod_name, args.debug)
         else:
             print("Use previous build")
 
@@ -242,10 +248,13 @@ require(['notebook/js/codecell'], function(codecell) {
         wheel = list(self.root.glob(f"target/wheels/*{mod_name}*.whl"))
         return len(wheel) > 0
 
-    def build(self, mod_name):
+    def build(self, mod_name, debug):
         cwd = Path.cwd().resolve()
         os.chdir(self.root / mod_name)
-        self.ipython.system_piped("maturin build --release")
+        if debug:
+            self.ipython.system_piped("maturin build")
+        else:
+            self.ipython.system_piped("maturin build --release")
         exit_code = self.ipython.user_ns["_exit_code"]
         os.chdir(str(cwd))
         if exit_code != 0:

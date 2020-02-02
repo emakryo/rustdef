@@ -11,7 +11,10 @@ This extension is built on [PyO3](https://github.com/PyO3/pyo3) and
 ## Examples
 
 - [Simple example](examples/simple.ipynb)
+- [Type conversion](examples/types.ipynb)
 - [Numpy example](examples/numpy.ipynb)
+
+## Rust type vs Python type
 
 ## Magic command
 
@@ -59,5 +62,4 @@ $ pip install target/wheels/rustdef-{version}-{python}-{platform}.whl
 - [ ] class/module supports
 - [ ] customizable module name
 - [ ] verbose flag
-- [ ] syntax highlight
 - [ ] serde support
