@@ -33,4 +33,4 @@ core = []
 numpy-bridge = ["numpy", "ndarray"]
 
 [package.metadata.maturin]
-require-dist = ["maturin", "jupyter"]
+requires-dist = ["maturin", "jupyter"]
