@@ -16,19 +16,27 @@ from .rustdef import export_names, prepare_self  # rust functions
 
 
 def line_macic_parser():
-    parser = ArgumentParser()
+    parser = ArgumentParser(prog="%rustdef")
 
     subparser = parser.add_subparsers()
-    depends_parser = subparser.add_parser("depends")
+    depends_parser = subparser.add_parser("depends", help="Add dependencies")
     depends_parser.set_defaults(command="depends")
-    depends_parser.add_argument("crates", nargs="+")
+    depends_parser.add_argument("crates", nargs="+", help="Dependencies to be added")
     return parser
 
 
 def cell_magic_parser():
-    parser = ArgumentParser()
-    parser.add_argument("--force-rebuild", action="store_true")
-    parser.add_argument("--debug", action="store_true")
+    parser = ArgumentParser(prog="%%rustdef")
+    parser.add_argument(
+        "--force-rebuild",
+        action="store_true",
+        help="Build code even if there exists cache",
+    )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Build with debug profile. By default, built with release profile",
+    )
     return parser
 
 
@@ -152,7 +160,7 @@ require(['notebook/js/codecell'], function(codecell) {
     codecell.CodeCell.options_default.highlight_modes['text/x-rustsrc']
         = {'reg':[/^%%rustdef/]} ;
     Jupyter.notebook.events.one('kernel_ready.Kernel', function(){
-        jupyter.notebook.get_cells().map(function(cell){
+        Jupyter.notebook.get_cells().map(function(cell){
         if (cell.cell_type == 'code'){ cell.auto_highlight(); } }) ;
     });
 });
@@ -181,7 +189,11 @@ require(['notebook/js/codecell'], function(codecell) {
             self.run(line, cell)
 
     def command(self, line):
-        args = self.line_parser.parse_args(line.split())
+        try:
+            args = self.line_parser.parse_args(line.split())
+        except SystemExit:
+            return
+
         if args.command == "depends":
             self.add_dependencies(args.crates)
 
@@ -194,9 +206,13 @@ require(['notebook/js/codecell'], function(codecell) {
                 self.dependencies[crate] = "*"
 
     def run(self, line, cell):
+        try:
+            args = self.cell_parser.parse_args(line.split())
+        except SystemExit:
+            return
+
         mod_name = f"rustdef_cell_{sha1(bytes(cell, 'utf-8')).hexdigest()}"
         exported_functions = self.add_src(mod_name, cell)
-        args = self.cell_parser.parse_args(line.split())
 
         new_mod_names = self.mod_names + [mod_name]
         self.update_workspace(new_mod_names)

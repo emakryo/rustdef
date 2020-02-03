@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Build caching
 - Numpy support
 - Stdout/stderr redirection
-- Add samples
+- Add examples
 - Custom crate dependency
 - Syntax highlighting
 
