@@ -99,6 +99,10 @@ jobs:
         # targets: # optional, default is
     - name: Install wheel
       run: pip install wheels/rustdef-*${{ matrix.python-name }}*.whl
+    - name: Install additional dependencies
+      run: pip install numpy
     - uses: actions/checkout@v2
-    - name: foo
-      run: ls
+    - name: Execute examples
+      shell: bash
+      run: jupyter-nbconvert --ExecutePreprocessor.timeout=-1 --execute *.ipynb
+      working-directory: examples

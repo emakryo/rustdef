@@ -31,3 +31,6 @@ features = ["extension-module"]
 default = ["numpy-bridge", "core"]
 core = []
 numpy-bridge = ["numpy", "ndarray"]
+
+[package.metadata.maturin]
+require-dist = ["maturin", "jupyter"]
