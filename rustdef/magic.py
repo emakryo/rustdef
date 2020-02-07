@@ -19,17 +19,27 @@ def line_macic_parser():
     parser = ArgumentParser(prog="%rustdef")
 
     subparser = parser.add_subparsers()
-    depends_parser = subparser.add_parser("depends", help="Add dependencies")
+    depends_parser = subparser.add_parser(
+        "depends", help="Add crate dependencies", description="Add crate dependencies"
+    )
     depends_parser.set_defaults(command="depends")
     depends_parser.add_argument("crates", nargs="+", help="Dependencies to be added")
-    clean_parser = subparser.add_parser("clean", help="Clean build caches")
+    clean_parser = subparser.add_parser(
+        "clean", help="Clean build cache", description="Clean build cache"
+    )
     clean_parser.set_defaults(command="clean")
-    clean_parser.add_argument("--cargo", action="store_true", help="Run `cargo clean` additionally")
+    clean_parser.add_argument(
+        "--cargo", action="store_true", help="Run `cargo clean` additionally"
+    )
     return parser
 
 
 def cell_magic_parser():
-    parser = ArgumentParser(prog="%%rustdef")
+    parser = ArgumentParser(
+        prog="%%rustdef",
+        description="Define rust functions in notebook cells. "
+        "Functions with #[pyfunction] are available in python",
+    )
     parser.add_argument(
         "--force-rebuild",
         action="store_true",
