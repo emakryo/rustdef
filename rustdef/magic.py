@@ -22,6 +22,9 @@ def line_macic_parser():
     depends_parser = subparser.add_parser("depends", help="Add dependencies")
     depends_parser.set_defaults(command="depends")
     depends_parser.add_argument("crates", nargs="+", help="Dependencies to be added")
+    clean_parser = subparser.add_parser("clean", help="Clean build caches")
+    clean_parser.set_defaults(command="clean")
+    clean_parser.add_argument("--cargo", action="store_true", help="Run `cargo clean` additionally")
     return parser
 
 
@@ -35,7 +38,7 @@ def cell_magic_parser():
     parser.add_argument(
         "--debug",
         action="store_true",
-        help="Build with debug profile. By default, built with release profile",
+        help="Build with debug profile. (release profile by default)",
     )
     return parser
 
@@ -174,7 +177,7 @@ require(['notebook/js/codecell'], function(codecell) {
         self.cell_parser = cell_magic_parser()
         self.mod_names = []
         self.dependencies = {}
-        self.root = Path.cwd() / ".rustdef"
+        self.root = Path.home() / ".rustdef"
         self.root.mkdir(exist_ok=True)
         (self.root / ".cargo").mkdir(exist_ok=True)
         (self.root / ".cargo/config").write_text(self.config)
@@ -197,6 +200,9 @@ require(['notebook/js/codecell'], function(codecell) {
         if args.command == "depends":
             self.add_dependencies(args.crates)
 
+        if args.command == "clean":
+            self.clean(args.cargo)
+
     def add_dependencies(self, crates):
         for crate in crates:
             if "==" in crate:
@@ -204,6 +210,17 @@ require(['notebook/js/codecell'], function(codecell) {
                 self.dependencies[crate[:sep_idx]] = crate[sep_idx + 2 :]
             else:
                 self.dependencies[crate] = "*"
+
+    def clean(self, cargo):
+        wheels = (self.root / "target/wheels").glob("*.whl")
+        for w in wheels:
+            w.unlink()
+
+        if cargo:
+            cwd = os.getcwd()
+            os.chdir(str(self.root))
+            self.ipython.system_raw("cargo clean")
+            os.chdir(cwd)
 
     def run(self, line, cell):
         try:

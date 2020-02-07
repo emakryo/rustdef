@@ -4,7 +4,7 @@
 
 Jupyter extension for jupyter notebook and rust user.
 
-You can define functions in rust and then run as python functions.
+You can define functions in rust and run them as python functions.
 This extension is built on [PyO3](https://github.com/PyO3/pyo3) and
 [maturin](https://github.com/PyO3/maturin).
 
@@ -47,7 +47,7 @@ fn my_func(x: i64, y: &str) -> i64 {
 Roughly, definitions in rustdef are available in python after the following steps.
 
 1. Each rustdef magic cell is populated with module definition of pyo3
-2. A new crate is generated for the rustdef cell 
+2. A new crate is generated for the rustdef cell
 3. The crate is compiled into a python wheel by `maturin`
 4. Install the wheel with pip
 5. Functions with `#[pyfunction]` attributes are exported into interpreter name space in notebook
@@ -69,6 +69,7 @@ $ pip install target/wheels/rustdef-{version}-{python}-{platform}.whl
 - [ ] specify dependency crate version
 - [ ] class/module supports
 - [ ] customizable module name
+- [ ] use functions defined in another cell
 - [ ] verbose flag
 - [ ] serde support
 - [ ] windows support
