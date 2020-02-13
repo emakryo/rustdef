@@ -38,7 +38,7 @@ fn export_names(code: &str) -> Vec<String> {
 
     let mut names = Vec::new();
     for item in parsed.items.iter() {
-        if has_fuction_attribute(item, "pyfunction") || has_fuction_attribute(item, "pyf") {
+        if has_fuction_attribute(item, "pyfunction"){
             if let syn::Item::Fn(itemfn) = item {
                 names.push(itemfn.sig.ident.to_string());
             }
