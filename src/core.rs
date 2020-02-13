@@ -1,12 +1,12 @@
 use pyo3::exceptions::RuntimeError;
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
-use syn;
-use std::path::Path;
-use zip;
 use std::fmt::Display;
-use std::io::{Cursor, copy};
 use std::fs;
+use std::io::{copy, Cursor};
+use std::path::Path;
+use syn;
+use zip;
 
 fn runtime_error<E: Display>(e: E) -> PyErr {
     RuntimeError::py_err(format!("{}", e))
@@ -21,8 +21,10 @@ fn has_fuction_attribute(item: &syn::Item, attr: &str) -> bool {
 
     for a in itemfn.attrs.iter() {
         match a.path.get_ident().map(|t| t.to_string()) {
-            Some(x) if x == attr => { return true; },
-            _ => ()
+            Some(x) if x == attr => {
+                return true;
+            }
+            _ => (),
         }
     }
     false
@@ -38,7 +40,7 @@ fn export_names(code: &str) -> Vec<String> {
 
     let mut names = Vec::new();
     for item in parsed.items.iter() {
-        if has_fuction_attribute(item, "pyfunction") || has_fuction_attribute(item, "pyf") {
+        if has_fuction_attribute(item, "pyfunction") {
             if let syn::Item::Fn(itemfn) = item {
                 names.push(itemfn.sig.ident.to_string());
             }
@@ -50,8 +52,7 @@ fn export_names(code: &str) -> Vec<String> {
 #[pyfunction]
 fn prepare_self(package_root: &str) -> PyResult<()> {
     let zipped = Cursor::new(&include_bytes!("../package.zip")[..]);
-    let mut zipped = zip::ZipArchive::new(zipped)
-        .map_err(runtime_error)?;
+    let mut zipped = zip::ZipArchive::new(zipped).map_err(runtime_error)?;
 
     let path = Path::new(package_root).join("rustdef");
     for i in 0..zipped.len() {

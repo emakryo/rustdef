@@ -10,7 +10,7 @@ This extension is built on [PyO3](https://github.com/PyO3/pyo3) and
 
 ## Examples
 
-- [Simple example](examples/simple.ipynb)
+- [Get Started](examples/Get%20started.ipynb)
 - [Type conversion](examples/types.ipynb)
 - [Numpy example](examples/numpy.ipynb)
 
@@ -65,6 +65,7 @@ $ pip install target/wheels/rustdef-{version}-{python}-{platform}.whl
 
 ### ToDo
 
+- [ ] path dependencies
 - [ ] execute within rustdef cell
 - [ ] specify dependency crate version
 - [ ] class/module supports
