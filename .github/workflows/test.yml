@@ -45,7 +45,7 @@ jobs:
       run: cargo clippy
     - name: Build wheel
       run: |
-        maturin build
+        maturin build --release
         ls target/wheels
     - uses: actions/upload-artifact@v1
       with:
