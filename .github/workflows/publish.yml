@@ -59,6 +59,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload to PyPI
-        run: twine upload --repository-url https://test.pypi.org/legacy -u emakryo target/wheels/*
+        run: twine upload --repository-url https://test.pypi.org/legacy/ -u emakryo target/wheels/*
         env:
           TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
