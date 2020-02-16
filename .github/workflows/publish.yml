@@ -55,7 +55,7 @@ jobs:
       - name: Upload to Release
         uses: JasonEtco/upload-to-release@v0.1.1
         with:
-          args: ${{ steps.build-wheel.wheel }}
+          args: ${{ steps.build-wheel.outputs.wheel }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload to PyPI
