@@ -39,10 +39,6 @@ jobs:
           # targets: # optional, default is
       - name: Install build dependencies
         run: pip install maturin jupyter numpy twine
-      - name: Python syntax check
-        run: flake8
-      - name: Rust syntax check
-        run: cargo clippy
       - name: Build wheel
         id: build-wheel
         run: |
