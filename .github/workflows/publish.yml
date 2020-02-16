@@ -52,13 +52,34 @@ jobs:
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.python-name}}
           path: target/wheels
+
+  upload:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-name: [cp36, cp37, cp38]
+
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: wheels-${{ matrix.os }}-${{ matrix.python-name }}
+      - name: Get wheel name
+        id: wheel-name
+        run: |
+          ls
+          wheel=`ls target/wheels/*${{ matrix.python-name }}*.whl`
+          echo $wheel
+          echo "::set-output name=wheel::$wheel"
       - name: Upload to Release
         uses: JasonEtco/upload-to-release@v0.1.1
         with:
-          args: ${{ steps.build-wheel.outputs.wheel }}
+          args: ${{ steps.wheel-name.outputs.wheel }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload to PyPI
-        run: twine upload --repository-url https://test.pypi.org/legacy/ -u emakryo target/wheels/*
+        run: twine upload --repository-url https://test.pypi.org/legacy/ -u emakryo
         env:
-          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD }}
