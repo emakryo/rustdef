@@ -70,13 +70,13 @@ jobs:
         id: wheel-name
         run: |
           ls
-          wheel=`ls target/wheels/*${{ matrix.python-name }}*.whl`
+          wheel=`ls */*${{ matrix.python-name }}*.whl`
           echo $wheel
-          echo "::set-output name=wheel::$wheel"
+          echo "::set-output name=wheel-path::$wheel"
       - name: Upload to Release
         uses: JasonEtco/upload-to-release@v0.1.1
         with:
-          args: ${{ steps.wheel-name.outputs.wheel }}
+          args: ${{ steps.wheel-name.outputs.wheel-path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload to PyPI
