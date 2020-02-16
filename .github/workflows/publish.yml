@@ -1,6 +1,7 @@
 name: Publish
 
-on: [release]
+on:
+  release: [created]
 
 jobs:
   build:
@@ -45,7 +46,7 @@ jobs:
           maturin build --release
           wheel=`ls target/wheels/*${{ matrix.python-name }}*.whl`
           echo $wheel
-          echo "::set-output name::wheel=$wheel"
+          echo "::set-output name=wheel::$wheel"
       - uses: actions/upload-artifact@v1
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.python-name}}
