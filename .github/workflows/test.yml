@@ -60,7 +60,7 @@ jobs:
       run: pip install target/wheels/rustdef-*${{ matrix.python-name }}*.whl
     - name: Execute examples
       shell: bash
-      run: jupyter-nbconvert --ExecutePreprocessor.timeout=-1 --execute *.ipynb
+      run: jupyter-nbconvert --debug --stdout --ExecutePreprocessor.timeout=-1 --execute *.ipynb
       working-directory: examples
 
   test:
