@@ -62,6 +62,10 @@ jobs:
       shell: bash
       run: jupyter-nbconvert --debug --stdout --ExecutePreprocessor.timeout=-1 --execute *.ipynb
       working-directory: examples
+    - name: Debug
+      shell: bash
+      run: python -c "from rustdef_cell_4f1f27901aca8ef8c2b7ba8fd8a3fd78760e5ae7 import *; import numpy as np; axpy(1.0, np.random.rand(3), np.random.rand(3))"
+      if: always()
 
   test:
     needs: build
