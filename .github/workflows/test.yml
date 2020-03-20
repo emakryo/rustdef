@@ -65,7 +65,7 @@ jobs:
     - name: Debug
       shell: bash
       run: |
-        pip install rustdef_cell_4f1f27901aca8ef8c2b7ba8fd8a3fd78760e5ae7
+        pip install ~/.rustdef/target/wheels/*-cp37-cp37m-manylinux1_x86_64.whl
         python -c "from rustdef_cell_4f1f27901aca8ef8c2b7ba8fd8a3fd78760e5ae7 import *; import numpy as np; axpy(1.0, np.random.rand(3), np.random.rand(3))"
       if: always()
 
