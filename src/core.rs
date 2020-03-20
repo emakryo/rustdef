@@ -5,7 +5,6 @@ use std::fmt::Display;
 use std::fs;
 use std::io::{copy, Cursor};
 use std::path::Path;
-use zip;
 
 fn runtime_error<E: Display>(e: E) -> PyErr {
     RuntimeError::py_err(format!("{}", e))
