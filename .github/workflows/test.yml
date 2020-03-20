@@ -64,7 +64,9 @@ jobs:
       working-directory: examples
     - name: Debug
       shell: bash
-      run: python -c "from rustdef_cell_4f1f27901aca8ef8c2b7ba8fd8a3fd78760e5ae7 import *; import numpy as np; axpy(1.0, np.random.rand(3), np.random.rand(3))"
+      run: |
+        pip install rustdef_cell_4f1f27901aca8ef8c2b7ba8fd8a3fd78760e5ae7
+        python -c "from rustdef_cell_4f1f27901aca8ef8c2b7ba8fd8a3fd78760e5ae7 import *; import numpy as np; axpy(1.0, np.random.rand(3), np.random.rand(3))"
       if: always()
 
   test:
