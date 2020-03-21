@@ -1,6 +1,10 @@
 name: Test
 
-on: [push]
+on:
+  push:
+    branches:
+      - '*'
+    tags:
 
 jobs:
   build:
@@ -45,7 +49,7 @@ jobs:
       run: cargo clippy
     - name: Build wheel
       run: |
-        maturin build
+        maturin build --release
         ls target/wheels
     - uses: actions/upload-artifact@v1
       with:
@@ -56,7 +60,9 @@ jobs:
       run: pip install target/wheels/rustdef-*${{ matrix.python-name }}*.whl
     - name: Execute examples
       shell: bash
-      run: jupyter-nbconvert --ExecutePreprocessor.timeout=-1 --execute *.ipynb
+      # Skip numpy.ipynb due to problem w/ pyo3 https://github.com/PyO3/rust-numpy/issues/97
+      # ##[error]thread '<unnamed>' panicked at 'An error occurred while initializing class SliceBox', rustdef_cell_4f1f27901aca8ef8c2b7ba8fd8a3fd78760e5ae7/src/lib.rs:1:1
+      run: jupyter-nbconvert --debug --stdout --ExecutePreprocessor.timeout=-1 --execute 'Get started.ipynb' types.ipynb
       working-directory: examples
 
   test:
@@ -104,5 +110,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: Execute examples
       shell: bash
-      run: jupyter-nbconvert --ExecutePreprocessor.timeout=-1 --execute *.ipynb
+      run: jupyter-nbconvert --debug --stdout --ExecutePreprocessor.timeout=-1 --execute 'Get started.ipynb' types.ipynb
       working-directory: examples

@@ -32,7 +32,7 @@ Add dependencies
 ```
 
 Define rust functions
-```
+```rust
 %%rustdef
 #[pyfunction]
 fn my_func(x: i64, y: &str) -> i64 {

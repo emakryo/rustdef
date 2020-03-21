@@ -1,6 +1,6 @@
 [package]
 name = "rustdef"
-version = "0.1.0"
+version = "0.1.0-alpha.2"
 authors = ["Ryosuke Kamesawa <emak.ryo@gmail.com>"]
 edition = "2018"
 
@@ -40,4 +40,4 @@ classifier = [
 ]
 requires-python = ">=3.6"
 requires-external = ["rust"]
-project-url = ["https://github.com/emakryo/rustdef"]
+project-url = ["Github, https://github.com/emakryo/rustdef"]
