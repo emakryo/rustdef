@@ -1,3 +1,4 @@
 /target
 package.zip
 .rustdef
+.ipynb_checkpoints

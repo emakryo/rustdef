@@ -16,10 +16,10 @@ zip = "0.5"
 [dependencies]
 quote = "1.0"
 zip = "0.5"
-numpy = { version = "0.7", optional = true }
+numpy = { version = "0.9", optional = true }
 ndarray = { version = "0.13", optional = true }
 syn = { version = "1.0", features = ["full"] }
-pyo3 = { version = "0.8", features = ["extension-module"] }
+pyo3 = { version = "0.10.1", features = ["extension-module"] }  # corresponds to numpy
 
 [features]
 default = ["numpy-bridge", "core"]

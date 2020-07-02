@@ -145,7 +145,7 @@ crate-type = ["cdylib"]
  features = ["numpy-bridge"]
 
 [dependencies.pyo3]
-version = "0.8"
+version = "0.10.1"
 features = ["extension-module"]
 """
     config = """
