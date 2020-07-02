@@ -277,7 +277,7 @@ require(['notebook/js/codecell'], function(codecell) {
         )
 
         src = self.lib_tpl.format(mod_name, register_function, src)
-        (package_root / f"src/lib.rs").write_text(src)
+        (package_root / "src/lib.rs").write_text(src)
 
         return exported_functions
 
