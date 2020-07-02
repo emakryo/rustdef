@@ -7,14 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Added
-
-- Numpy support
-
 ### Changed
 ### Deprecated
 ### Removed
 ### Fixed
 ### Security
+
+
+# [0.1.1] 2020-07-02
+
+### Fixed
+
+- Numpy support
+- Update dependencies
+
 
 ## [0.1.0] 2020-3-22
 
