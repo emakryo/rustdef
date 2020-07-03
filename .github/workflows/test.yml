@@ -1,10 +1,6 @@
 name: Test
 
-on:
-  push:
-    branches:
-      - '*'
-    tags:
+on: push
 
 jobs:
   build:
