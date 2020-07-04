@@ -82,12 +82,22 @@ jobs:
           wheel=`ls */*${{ matrix.python-name }}*.whl`
           echo $wheel
           echo "::set-output name=wheel-path::$wheel"
+          echo "::set-output name=wheel-name::$(basename $wheel)"
+      - name: Get upload URL
+        id: get-upload-url
+        run: |
+          json=`curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/emakryo/rustdef/releases/latest`
+          upload_url=`echo $json | jq -r .upload_url`
+          echo "::set-output name=upload-url::$upload_url"
       - name: Upload to Release
-        uses: JasonEtco/upload-to-release@v0.1.1
-        with:
-          args: ${{ steps.wheel-name.outputs.wheel-path }}
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get-upload-url.outputs.upload-url }}
+          asset_path: ${{ steps.wheel-name.outputs.wheel-path }}
+          asset_name: ${{ steps.wheel-name.outputs.wheel-name }}
+          asset_content_type: application/x-wheel+zip
       - name: Upload to PyPI
         # run: twine upload --repository-url https://test.pypi.org/legacy/ -u emakryo ${{ steps.wheel-name.outputs.wheel-path }}
         run: twine upload -u emakryo ${{ steps.wheel-name.outputs.wheel-path }}
