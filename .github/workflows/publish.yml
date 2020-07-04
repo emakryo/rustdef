@@ -86,7 +86,7 @@ jobs:
       - name: Get upload URL
         id: get-upload-url
         run: |
-          json=`curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/emakryo/rustdef/releases/latest
+          json=`curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/emakryo/rustdef/releases/latest`
           upload_url=`echo $json | jq -r .upload_url`
           echo "::set-output name::upload-url::$upload_url"
       - name: Upload to Release
