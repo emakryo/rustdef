@@ -97,6 +97,7 @@ jobs:
           upload_url: ${{ steps.get-upload-url.outputs.upload-url }}
           asset_path: ${{ steps.wheel-name.outputs.wheel-path }}
           asset_name: ${{ steps.wheel-name.outputs.wheel-name }}
+          asset_content_type: application/x-wheel+zip
       - name: Upload to PyPI
         run: twine upload --repository-url https://test.pypi.org/legacy/ -u emakryo ${{ steps.wheel-name.outputs.wheel-path }}
         # run: twine upload -u emakryo ${{ steps.wheel-name.outputs.wheel-path }}
