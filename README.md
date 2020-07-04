@@ -1,6 +1,7 @@
 # rustdef
 
-![](https://github.com/emakryo/rustdef/workflows/Test/badge.svg?branch=master)
+[![Test](https://github.com/emakryo/rustdef/workflows/Test/badge.svg?branch=master)](https://github.com/emakryo/rustdef/actions?query=branch%3Amaster)
+[![PyPI version](https://badge.fury.io/py/rustdef.svg)](https://badge.fury.io/py/rustdef)
 
 Jupyter extension for jupyter notebook and rust user.
 
