@@ -19,7 +19,7 @@ zip = "0.5"
 numpy = { version = "0.9", optional = true }
 ndarray = { version = "0.13", optional = true }
 syn = { version = "1.0", features = ["full"] }
-pyo3 = { version = "0.10.1", features = ["extension-module"] }  # version corresponds to numpy
+pyo3 = { version = "0.12.0", features = ["extension-module"] }  # version corresponds to numpy
 
 [features]
 default = ["numpy-bridge", "core"]
