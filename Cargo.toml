@@ -1,6 +1,6 @@
 [package]
 name = "rustdef"
-version = "0.1.2"
+version = "0.2.0"
 authors = ["Ryosuke Kamesawa <emak.ryo@gmail.com>"]
 edition = "2018"
 
@@ -16,15 +16,8 @@ zip = "0.5"
 [dependencies]
 quote = "1.0"
 zip = "0.5"
-numpy = { version = "0.9", optional = true }
-ndarray = { version = "0.13", optional = true }
 syn = { version = "1.0", features = ["full"] }
-pyo3 = { version = "0.10.1", features = ["extension-module"] }  # version corresponds to numpy
-
-[features]
-default = ["numpy-bridge", "core"]
-core = []
-numpy-bridge = ["numpy", "ndarray"]
+pyo3 = { version = "0.11.1", features = ["extension-module"] }  # version corresponds to numpy
 
 [package.metadata.maturin]
 requires-dist = ["maturin", "jupyter"]

@@ -29,7 +29,7 @@ fn has_fuction_attribute(item: &syn::Item, attr: &str) -> bool {
 }
 
 #[pyfunction]
-fn export_names(code: &str) -> Vec<String> {
+fn get_function_names_with_attribute(code: &str, attr: &str) -> Vec<String> {
     let parsed: syn::File = if let Ok(f) = syn::parse_str(code) {
         f
     } else {
@@ -38,7 +38,7 @@ fn export_names(code: &str) -> Vec<String> {
 
     let mut names = Vec::new();
     for item in parsed.items.iter() {
-        if has_fuction_attribute(item, "pyfunction") {
+        if has_fuction_attribute(item, attr) {
             if let syn::Item::Fn(itemfn) = item {
                 names.push(itemfn.sig.ident.to_string());
             }
@@ -73,7 +73,7 @@ fn prepare_self(package_root: &str) -> PyResult<()> {
 
 #[pymodule]
 fn rustdef(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_wrapped(wrap_pyfunction!(export_names))?;
+    m.add_wrapped(wrap_pyfunction!(get_function_names_with_attribute))?;
     m.add_wrapped(wrap_pyfunction!(prepare_self))?;
 
     Ok(())

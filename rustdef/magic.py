@@ -12,7 +12,7 @@ from IPython import get_ipython
 from IPython.display import display, Javascript
 
 from . import __version__
-from .rustdef import export_names, prepare_self  # rust functions
+from .rustdef import get_function_names_with_attribute, prepare_self  # rust functions
 
 
 def line_macic_parser():
@@ -139,13 +139,8 @@ crate-type = ["cdylib"]
 [dependencies]
 {}
 
-[dependencies.rustdef]
- path = "../rustdef"
- default-features = false
- features = ["numpy-bridge"]
-
 [dependencies.pyo3]
-version = "0.10.1"
+version = "0.11.1"
 features = ["extension-module"]
 """
     config = """
@@ -156,17 +151,17 @@ rustflags = [
 ]
 """
     lib_tpl = """
-// #![allow(unused)]
+#![allow(unused)]
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 
 #[pymodule]
 fn {}(_py: Python, m: &PyModule) -> PyResult<()> {{
 {}
-Ok(())
-}}
 
 {}
+Ok(())
+}}
 """
     js = """
 require(['notebook/js/codecell'], function(codecell) {
@@ -239,7 +234,9 @@ require(['notebook/js/codecell'], function(codecell) {
             return
 
         mod_name = f"rustdef_cell_{sha1(bytes(cell, 'utf-8')).hexdigest()}"
-        exported_functions = self.add_src(mod_name, cell)
+        exported_functions = [
+            fn for fns in self.add_src(mod_name, cell).values() for fn in fns
+        ]
 
         new_mod_names = self.mod_names + [mod_name]
         self.update_workspace(new_mod_names)
@@ -260,7 +257,10 @@ require(['notebook/js/codecell'], function(codecell) {
             self.mod_names = new_mod_names
 
     def add_src(self, mod_name, src):
-        exported_functions = export_names(src)
+        functions = {
+            "pyfn": get_function_names_with_attribute(src, "pyfn"),
+            "pyfunction": get_function_names_with_attribute(src, "pyfunction")
+        }
 
         package_root = self.root / mod_name
         package_root.mkdir(exist_ok=True)
@@ -272,14 +272,14 @@ require(['notebook/js/codecell'], function(codecell) {
         register_function = "\n".join(
             [
                 f"m.add_wrapped(wrap_pyfunction!({fname}))?;"
-                for fname in exported_functions
+                for fname in functions["pyfunction"]
             ]
         )
 
-        src = self.lib_tpl.format(mod_name, register_function, src)
+        src = self.lib_tpl.format(mod_name, src, register_function)
         (package_root / "src/lib.rs").write_text(src)
 
-        return exported_functions
+        return functions
 
     def update_workspace(self, mod_names):
         (self.root / "Cargo.toml").write_text(
