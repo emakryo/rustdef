@@ -16,15 +16,8 @@ zip = "0.5"
 [dependencies]
 quote = "1.0"
 zip = "0.5"
-#numpy = { version = "0.11", optional = true }
-#ndarray = { version = "0.13", optional = true }
 syn = { version = "1.0", features = ["full"] }
 pyo3 = { version = "0.11.1", features = ["extension-module"] }  # version corresponds to numpy
-
-[features]
-default = ["core"]
-core = []
-#numpy-bridge = ["numpy", "ndarray"]
 
 [package.metadata.maturin]
 requires-dist = ["maturin", "jupyter"]

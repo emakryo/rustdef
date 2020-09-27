@@ -139,9 +139,6 @@ crate-type = ["cdylib"]
 [dependencies]
 {}
 
-# [dependencies.rustdef]
-# path = "../rustdef"
-
 [dependencies.pyo3]
 version = "0.11.1"
 features = ["extension-module"]
