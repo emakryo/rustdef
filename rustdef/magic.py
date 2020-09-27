@@ -271,7 +271,7 @@ require(['notebook/js/codecell'], function(codecell) {
 
         register_function = "\n".join(
             [
-                f"m.add_function(wrap_pyfunction!({fname}, m)?)?;"
+                f"m.add_wrapped(wrap_pyfunction!({fname}))?;"
                 for fname in functions["pyfunction"]
             ]
         )
