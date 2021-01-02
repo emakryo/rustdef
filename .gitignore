@@ -2,3 +2,6 @@
 package.zip
 .rustdef
 .ipynb_checkpoints
+.python-version
+poetry.lock
+/rustdef/*.so

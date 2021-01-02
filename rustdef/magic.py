@@ -295,10 +295,12 @@ require(['notebook/js/codecell'], function(codecell) {
     def build(self, mod_name, debug):
         cwd = Path.cwd().resolve()
         os.chdir(self.root / mod_name)
-        if debug:
-            self.ipython.system_piped("maturin build")
-        else:
-            self.ipython.system_piped("maturin build --release")
+        opts = []
+        if not debug:
+            opts.append("--release")
+
+        cmd = "maturin build --manylinux 2014 " + " ".join(opts)
+        self.ipython.system_piped(cmd)
         exit_code = self.ipython.user_ns["_exit_code"]
         os.chdir(str(cwd))
         if exit_code != 0:
