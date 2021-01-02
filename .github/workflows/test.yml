@@ -25,17 +25,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup Python environment
-      uses: actions/setup-python@v1.1.1
+      uses: actions/setup-python@v2
       with:
         # Version range or exact version of a Python version to use, using semvers version range syntax.
         python-version: ${{ matrix.python }} # optional, default is 3.x
         # The target architecture (x86, x64) of the Python interpreter.
         architecture: x64 # optional, default is x64
     - name: Set up a Rust toolchain
-      uses: hecrj/setup-rust-action@v1.3.1
+      uses: actions-rs/toolchain@v1
       with:
         # The toolchain name, such as stable, nightly, or 1.8.0
-        rust-version: nightly # optional, default is stable
+        toolchain: nightly # optional, default is stable
         # The toolchain components to install, comma-separated
         components: clippy # optional, default is
         # The toolchain targets to add, comma-separated
@@ -87,17 +87,17 @@ jobs:
         name: wheels-${{ matrix.os }}-${{ matrix.python-name }}
         path: wheels
     - name: Setup Python environment
-      uses: actions/setup-python@v1.1.1
+      uses: actions/setup-python@v2
       with:
         # Version range or exact version of a Python version to use, using semvers version range syntax.
         python-version: ${{ matrix.python }} # optional, default is 3.x
         # The target architecture (x86, x64) of the Python interpreter.
         architecture: x64 # optional, default is x64
     - name: Set up a Rust toolchain
-      uses: hecrj/setup-rust-action@v1.3.1
+      uses: actions-rs/toolchain@v1
       with:
         # The toolchain name, such as stable, nightly, or 1.8.0
-        rust-version: nightly # optional, default is stable
+        toolchain: nightly # optional, default is stable
         # The toolchain components to install, comma-separated
         components: clippy # optional, default is
         # The toolchain targets to add, comma-separated
@@ -109,5 +109,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: Execute examples
       shell: bash
-      run: jupyter-nbconvert --to html --debug --stdout --ExecutePreprocessor.timeout=-1 --execute 'Get started.ipynb' types.ipynb numpy.ipynb
+      run: jupyter-nbconvert --to html --debug --stdout --ExecutePreprocessor.timeout=-1 --execute 'Get started.ipynb' types.ipynb
       working-directory: examples
