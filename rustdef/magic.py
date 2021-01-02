@@ -46,9 +46,9 @@ def cell_magic_parser():
         help="Build code even if there exists cache",
     )
     parser.add_argument(
-        "--debug",
+        "--release",
         action="store_true",
-        help="Build with debug profile. (release profile by default)",
+        help="Build with release profile. (debug profile by default)",
     )
     return parser
 
@@ -243,7 +243,7 @@ require(['notebook/js/codecell'], function(codecell) {
 
         if args.force_rebuild or not self.exists_wheel(mod_name):
             print("Building..")
-            self.build(mod_name, args.debug)
+            self.build(mod_name, args.release)
         else:
             print("Use previous build")
 
@@ -292,11 +292,11 @@ require(['notebook/js/codecell'], function(codecell) {
         wheel = list(self.root.glob(f"target/wheels/*{mod_name}*.whl"))
         return len(wheel) > 0
 
-    def build(self, mod_name, debug):
+    def build(self, mod_name, release):
         cwd = Path.cwd().resolve()
         os.chdir(self.root / mod_name)
         opts = []
-        if not debug:
+        if release:
             opts.append("--release")
 
         cmd = "maturin build --manylinux 2014 " + " ".join(opts)

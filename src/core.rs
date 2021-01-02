@@ -1,4 +1,4 @@
-use pyo3::exceptions::RuntimeError;
+use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 use std::fmt::Display;
@@ -7,7 +7,7 @@ use std::io::{copy, Cursor};
 use std::path::Path;
 
 fn runtime_error<E: Display>(e: E) -> PyErr {
-    RuntimeError::py_err(format!("{}", e))
+    PyRuntimeError::new_err(format!("{}", e))
 }
 
 fn has_fuction_attribute(item: &syn::Item, attr: &str) -> bool {
@@ -55,7 +55,7 @@ fn prepare_self(package_root: &str) -> PyResult<()> {
     let path = Path::new(package_root).join("rustdef");
     for i in 0..zipped.len() {
         let mut z = zipped.by_index(i).map_err(runtime_error)?;
-        let name = path.join(z.sanitized_name());
+        let name = path.join(z.mangled_name());
 
         if z.is_dir() {
             fs::create_dir_all(name)?;

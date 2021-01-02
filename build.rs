@@ -7,7 +7,7 @@ use zip::{write::FileOptions, ZipWriter};
 
 fn recursive<W: Write + Seek>(writer: &mut ZipWriter<W>, dir: &Path) -> Result<(), Error> {
     writer
-        .add_directory_from_path(dir, FileOptions::default())
+        .add_directory(dir.to_string_lossy(), FileOptions::default())
         .map_err(Error::from)?;
     for ent in fs::read_dir(dir)? {
         let path = ent.map_err(Error::from)?.path();
@@ -15,7 +15,7 @@ fn recursive<W: Write + Seek>(writer: &mut ZipWriter<W>, dir: &Path) -> Result<(
             recursive(writer, &path)?;
         } else if path.is_file() {
             writer
-                .start_file_from_path(&path, FileOptions::default())
+                .start_file(path.to_string_lossy(), FileOptions::default())
                 .map_err(Error::from)?;
             let mut f = fs::File::open(path)?;
             copy(&mut f, writer)?;
@@ -37,7 +37,7 @@ fn main() {
 
     let filename = Path::new("Cargo.toml");
     writer
-        .start_file_from_path(&filename, FileOptions::default())
+        .start_file(filename.to_string_lossy(), FileOptions::default())
         .expect("failed to add to zip");
     let mut f = fs::File::open(filename).expect("failed to create");
     copy(&mut f, &mut writer).expect("failed to copy");
