@@ -3,4 +3,22 @@ requires = ["maturin"]
 build-backend = "maturin"
 
 [package.metadata.maturin]
-requires-dist = ["jupyter"]
+requires-dist = [
+    "jupyter",
+    "pip>=19.3"
+]
+
+# Poetry is used for development
+[tool.poetry]
+name = "rustdef"
+version = "0.2.0"
+description = ""
+authors = ["Ryosuke Kamesawa <emak.ryo@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+jupyter = "^1.0.0"
+maturin = "^0.8.3"
+pip = "^19.3"
+
+[tool.poetry.dev-dependencies]

@@ -15,11 +15,13 @@ This extension is built on [PyO3](https://github.com/PyO3/pyo3) and
 - [Type conversion](examples/types.ipynb)
 - [Numpy example](examples/numpy.ipynb)
 
-## Install
+## Prerequisite
 
-[Jupyter notebook](https://jupyter.org/install.html) and
-[nightly rust](https://www.rust-lang.org/tools/install) are required.
-Then, you can install `rustdef` by `pip`.
+- Python >= 3.6 and pip >= 19.3
+- [Jupyter notebook](https://jupyter.org/install.html)
+- [nightly rust](https://www.rust-lang.org/tools/install)
+
+## Install
 
 ```shell script
 $ pip install rustdef
