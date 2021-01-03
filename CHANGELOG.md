@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 ### Security
 
+## [0.2.0] 2021-01-03
+
+### Changed
+
+- Bump pyo3 to v0.13
+- Update dependencies
+- Remove numpy wrapper
 
 ## [0.1.1] 2020-07-02
 
