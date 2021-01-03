@@ -36,7 +36,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           # The toolchain name, such as stable, nightly, or 1.8.0
-          toolchain: nightly # optional, default is stable
+          toolchain: stable # optional, default is stable
           # The toolchain components to install, comma-separated
           components: clippy # optional, default is
           # The toolchain targets to add, comma-separated
