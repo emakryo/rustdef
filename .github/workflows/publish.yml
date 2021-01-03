@@ -1,6 +1,8 @@
 name: Publish
 
 on:
+  push:
+    - fix/release-workflow
   release:
     types: [created]
 
@@ -31,7 +33,7 @@ jobs:
           # The target architecture (x86, x64) of the Python interpreter.
           architecture: x64 # optional, default is x64
       - name: Set up a Rust toolchain
-        uses: actoins-rs/toolchain@v2
+        uses: actions-rs/toolchain@v2
         with:
           # The toolchain name, such as stable, nightly, or 1.8.0
           toolchain: nightly # optional, default is stable
@@ -99,8 +101,8 @@ jobs:
           asset_name: ${{ steps.wheel-name.outputs.wheel-name }}
           asset_content_type: application/x-wheel+zip
       - name: Upload to PyPI
-        # run: twine upload --repository-url https://test.pypi.org/legacy/ -u emakryo ${{ steps.wheel-name.outputs.wheel-path }}
-        run: twine upload -u emakryo ${{ steps.wheel-name.outputs.wheel-path }}
+        run: twine upload --repository-url https://test.pypi.org/legacy/ -u emakryo ${{ steps.wheel-name.outputs.wheel-path }}
+        # run: twine upload -u emakryo ${{ steps.wheel-name.outputs.wheel-path }}
         env:
-          # TWINE_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD }}
+          # TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
