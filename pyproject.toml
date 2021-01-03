@@ -17,8 +17,9 @@ authors = ["Ryosuke Kamesawa <emak.ryo@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
+pip = "^19.3"
 jupyter = "^1.0.0"
 maturin = "^0.8.3"
-pip = "^19.3"
+numpy = "^1.19.4"
 
 [tool.poetry.dev-dependencies]

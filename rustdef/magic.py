@@ -1,6 +1,7 @@
 import os
 import select
 import subprocess
+import sys
 import threading
 from argparse import ArgumentParser
 from contextlib import contextmanager
@@ -140,7 +141,7 @@ crate-type = ["cdylib"]
 {}
 
 [dependencies.pyo3]
-version = "0.11.1"
+version = "0.13.0"
 features = ["extension-module"]
 """
     config = """
@@ -295,11 +296,16 @@ require(['notebook/js/codecell'], function(codecell) {
     def build(self, mod_name, release):
         cwd = Path.cwd().resolve()
         os.chdir(self.root / mod_name)
-        opts = []
+        opts = [
+            "--manylinux",
+            "2014",
+            "--interpreter",
+            sys.executable,
+        ]
         if release:
             opts.append("--release")
 
-        cmd = "maturin build --manylinux 2014 " + " ".join(opts)
+        cmd = "maturin build  " + " ".join(opts)
         self.ipython.system_piped(cmd)
         exit_code = self.ipython.user_ns["_exit_code"]
         os.chdir(str(cwd))
