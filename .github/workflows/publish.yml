@@ -63,7 +63,7 @@ jobs:
     needs: build
     steps:
       - name: Setup Python environment
-        uses: actions/setup-python@v1.1.1
+        uses: actions/setup-python@v2
         # with:
           # Version range or exact version of a Python version to use, using semvers version range syntax.
           # python-version: ${{ matrix.python }} # optional, default is 3.x
