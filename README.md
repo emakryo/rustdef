@@ -19,7 +19,7 @@ This extension is built on [PyO3](https://github.com/PyO3/pyo3) and
 
 - Python >= 3.6 and pip >= 19.3
 - [Jupyter notebook](https://jupyter.org/install.html)
-- [nightly rust](https://www.rust-lang.org/tools/install)
+- [Rust](https://www.rust-lang.org/tools/install)
 
 ## Install
 

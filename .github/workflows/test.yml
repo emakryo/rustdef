@@ -37,7 +37,7 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         # The toolchain name, such as stable, nightly, or 1.8.0
-        toolchain: nightly # optional, default is stable
+        toolchain: stable # optional, default is stable
         # The toolchain components to install, comma-separated
         components: clippy # optional, default is
         # The toolchain targets to add, comma-separated
@@ -46,7 +46,7 @@ jobs:
       run: pip install maturin jupyter numpy flake8
     - name: Python syntax check
       run: flake8
-    - name: Rust syntax check
+    - name: Rust lint
       run: cargo clippy
     - name: Build wheel
       run: |
@@ -63,7 +63,7 @@ jobs:
       shell: bash
       # Skip numpy.ipynb due to problem w/ pyo3 https://github.com/PyO3/rust-numpy/issues/97
       # ##[error]thread '<unnamed>' panicked at 'An error occurred while initializing class SliceBox', rustdef_cell_4f1f27901aca8ef8c2b7ba8fd8a3fd78760e5ae7/src/lib.rs:1:1
-      run: jupyter-nbconvert --to html --debug --stdout --ExecutePreprocessor.timeout=-1 --execute 'Get started.ipynb' types.ipynb
+      run: jupyter-nbconvert --to html --debug --stdout --ExecutePreprocessor.timeout=-1 --execute 'Get started.ipynb' types.ipynb numpy.ipynb
       working-directory: examples
 
   test:
@@ -101,9 +101,9 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         # The toolchain name, such as stable, nightly, or 1.8.0
-        toolchain: nightly # optional, default is stable
+        toolchain: stable # optional, default is stable
         # The toolchain components to install, comma-separated
-        components: clippy # optional, default is
+        # components: # optional, default is
         # The toolchain targets to add, comma-separated
         # targets: # optional, default is
     - name: Install wheel
@@ -113,5 +113,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: Execute examples
       shell: bash
-      run: jupyter-nbconvert --to html --debug --stdout --ExecutePreprocessor.timeout=-1 --execute 'Get started.ipynb' types.ipynb
+      run: jupyter-nbconvert --to html --debug --stdout --ExecutePreprocessor.timeout=-1 --execute 'Get started.ipynb' types.ipynb numpy.ipynb
       working-directory: examples
