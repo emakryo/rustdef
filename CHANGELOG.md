@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 ### Security
 
+- Use stable rust
+
 ## [0.2.0] 2021-01-03
 
 ### Changed
