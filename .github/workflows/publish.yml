@@ -1,9 +1,6 @@
 name: Publish
 
 on:
-  push:
-    branches:
-      - fix/release-workflow
   release:
     types: [created]
 
@@ -102,8 +99,8 @@ jobs:
           asset_name: ${{ steps.wheel-name.outputs.wheel-name }}
           asset_content_type: application/x-wheel+zip
       - name: Upload to PyPI
-        run: twine upload --repository-url https://test.pypi.org/legacy/ -u emakryo ${{ steps.wheel-name.outputs.wheel-path }}
-        # run: twine upload -u emakryo ${{ steps.wheel-name.outputs.wheel-path }}
+        # run: twine upload --repository-url https://test.pypi.org/legacy/ -u emakryo ${{ steps.wheel-name.outputs.wheel-path }}
+        run: twine upload -u emakryo ${{ steps.wheel-name.outputs.wheel-path }}
         env:
-          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD }}
-          # TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          # TWINE_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
