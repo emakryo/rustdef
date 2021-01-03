@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python: [3.6, 3.7, 3.8]
+        python: [3.6, 3.7, 3.8, 3.9]
         include:
           - python: 3.6
             python-name: cp36
@@ -21,6 +21,8 @@ jobs:
             python-name: cp37
           - python: 3.8
             python-name: cp38
+          - python: 3.9
+            python-name: cp39
 
     steps:
     - uses: actions/checkout@v2
@@ -72,7 +74,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python: [3.6, 3.7, 3.8]
+        python: [3.6, 3.7, 3.8, 3.9]
         include:
           - python: 3.6
             python-name: cp36
@@ -80,6 +82,8 @@ jobs:
             python-name: cp37
           - python: 3.8
             python-name: cp38
+          - python: 3.9
+            python-name: cp39
 
     steps:
     - uses: actions/download-artifact@v1
