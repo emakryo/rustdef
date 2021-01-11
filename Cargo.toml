@@ -17,7 +17,7 @@ zip = "0.5.9"
 quote = "1.0.8"
 zip = "0.5.9"
 syn = { version = "1.0.57", features = ["full"] }
-pyo3 = { version = "0.13.0", features = ["extension-module"] }  # version corresponds to numpy
+pyo3 = { version = "0.13.1", features = ["extension-module"] }  # version corresponds to numpy
 
 [package.metadata.maturin]
 requires-dist = ["maturin", "jupyter"]
