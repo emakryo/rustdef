@@ -16,7 +16,7 @@ zip = "0.5.9"
 [dependencies]
 quote = "1.0.8"
 zip = "0.5.9"
-syn = { version = "1.0.57", features = ["full"] }
+syn = { version = "1.0.60", features = ["full"] }
 pyo3 = { version = "0.13.0", features = ["extension-module"] }  # version corresponds to numpy
 
 [package.metadata.maturin]
