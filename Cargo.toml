@@ -33,4 +33,4 @@ classifier = [
 ]
 requires-python = ">=3.6"
 requires-external = ["rust"]
-project-url = ["Github, https://github.com/emakryo/rustdef"]
+project-url = { Github = "https://github.com/emakryo/rustdef" }
