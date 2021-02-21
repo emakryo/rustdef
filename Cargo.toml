@@ -11,11 +11,11 @@ crate-type = ["cdylib", "rlib"]
 
 [build-dependencies]
 glob = "0.3.0"
-zip = "0.5.9"
+zip = "0.5.10"
 
 [dependencies]
 quote = "1.0.9"
-zip = "0.5.9"
+zip = "0.5.10"
 syn = { version = "1.0.60", features = ["full"] }
 pyo3 = { version = "0.13.0", features = ["extension-module"] }  # version corresponds to numpy
 
