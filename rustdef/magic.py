@@ -298,7 +298,7 @@ require(['notebook/js/codecell'], function(codecell) {
         os.chdir(self.root / mod_name)
         opts = [
             "--manylinux",
-            "2014",
+            "off",
             "--interpreter",
             sys.executable,
         ]
