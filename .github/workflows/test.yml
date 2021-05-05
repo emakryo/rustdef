@@ -112,6 +112,8 @@ jobs:
       run: pip install wheels/rustdef-*${{ matrix.python-name }}*.whl
     - name: Install additional dependencies
       run: pip install numpy
+    - name: Install cargo-edit
+      run: cargo install cargo-edit
     - uses: actions/checkout@v2
     - name: Execute examples
       shell: bash
