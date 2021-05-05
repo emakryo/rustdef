@@ -44,6 +44,8 @@ jobs:
         # targets: # optional, default is
     - name: Install build dependencies
       run: pip install maturin jupyter numpy flake8
+    - name: Install runtime dependencies
+      run: cargo install cargo-edit
     - name: Python syntax check
       run: flake8
     - name: Rust lint
