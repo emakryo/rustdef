@@ -3,6 +3,7 @@ import select
 import subprocess
 import sys
 import threading
+import uuid
 from argparse import ArgumentParser
 from contextlib import contextmanager
 from hashlib import sha1
@@ -12,19 +13,32 @@ import toml
 from IPython import get_ipython
 from IPython.display import display, Javascript
 
-from . import __version__
-from .rustdef import get_function_names_with_attribute, prepare_self  # rust functions
+from .rustdef import get_function_names_with_attribute  # rust functions
 
 
 def line_macic_parser():
     parser = ArgumentParser(prog="%rustdef")
 
     subparser = parser.add_subparsers()
-    depends_parser = subparser.add_parser(
-        "depends", help="Add crate dependencies", description="Add crate dependencies"
+    deps_parser = subparser.add_parser("deps", help="Dependencies related subcommands")
+    deps_subparser = deps_parser.add_subparsers()
+    add_parser = deps_subparser.add_parser(
+        "add", help="Add dependencies", description="Add dependencies"
     )
-    depends_parser.set_defaults(command="depends")
-    depends_parser.add_argument("crates", nargs="+", help="Dependencies to be added")
+    add_parser.set_defaults(command="add")
+    add_parser.add_argument(
+        "args", nargs="+", help="Dependencies to be added. See cargo-edit"
+    )
+
+    show_parser = deps_subparser.add_parser("show", help="Show dependencies")
+    show_parser.set_defaults(command="show")
+
+    rm_parser = deps_subparser.add_parser("rm", help="Remove dependencies")
+    rm_parser.set_defaults(command="rm")
+    rm_parser.add_argument(
+        "args", nargs="+", help="Dependencies to be removed. See cargo-edit"
+    )
+
     clean_parser = subparser.add_parser(
         "clean", help="Clean build cache", description="Clean build cache"
     )
@@ -127,23 +141,7 @@ class RustdefMagic:
 [workspace]
 members = {}
 """
-    cargo_tpl = """
-[package]
-name = "{}"
-authors = ["rustdef-magic"]
-version = "0.1.0"
-edition = "2018"
 
-[lib]
-crate-type = ["cdylib"]
-
-[dependencies]
-{}
-
-[dependencies.pyo3]
-version = "0.13.0"
-features = ["extension-module"]
-"""
     config = """
 [target.x86_64-apple-darwin]
 rustflags = [
@@ -151,6 +149,7 @@ rustflags = [
   "-C", "link-arg=dynamic_lookup",
 ]
 """
+
     lib_tpl = """
 #![allow(unused)]
 use pyo3::prelude::*;
@@ -164,6 +163,7 @@ fn {}(_py: Python, m: &PyModule) -> PyResult<()> {{
 Ok(())
 }}
 """
+
     js = """
 require(['notebook/js/codecell'], function(codecell) {
     codecell.CodeCell.options_default.highlight_modes['text/x-rustsrc']
@@ -181,15 +181,37 @@ require(['notebook/js/codecell'], function(codecell) {
         self.ipython = ipython
         self.line_parser = line_macic_parser()
         self.cell_parser = cell_magic_parser()
-        self.mod_names = []
         self.dependencies = {}
         self.root = Path.home() / ".rustdef"
         self.root.mkdir(exist_ok=True)
         (self.root / ".cargo").mkdir(exist_ok=True)
         (self.root / ".cargo/config").write_text(self.config)
-        prepare_self(str(self.root))
 
         display(Javascript(self.js))
+
+        self.create_template()
+
+    def create_template(self):
+        self.template_uuid = f"template-{uuid.uuid1()}"
+        self.template_path = self.root / self.template_uuid
+        self.template_path.mkdir(parents=True)
+        self.add_workspace_member(self.template_uuid)
+
+        subprocess.run(
+            ["cargo", "init", "--lib", "--vcs", "none"],
+            cwd=self.template_path,
+            check=True,
+        )
+        with open(self.template_path / "Cargo.toml", "a") as f:
+            f.write("\n" "[lib]\n" 'crate-type = ["cdylib"]\n\n')
+
+        # numpy compatible version
+        pyo3 = ["pyo3@0.13.2", "--features", "extension-module"]
+        try:
+            self.add_dependencies(pyo3)
+        except subprocess.CalledProcessError as e:
+            print("Please install cargo-edit", file=sys.stderr)
+            raise e
 
     def invoke(self, line, cell=None):
         if cell is None:
@@ -203,19 +225,31 @@ require(['notebook/js/codecell'], function(codecell) {
         except SystemExit:
             return
 
-        if args.command == "depends":
-            self.add_dependencies(args.crates)
+        if args.command == "add":
+            self.add_dependencies(args.args)
 
-        if args.command == "clean":
+        elif args.command == "rm":
+            self.rm_dependencies(args.args)
+
+        elif args.command == "show":
+            self.show_dependencies()
+
+        elif args.command == "clean":
             self.clean(args.cargo)
 
-    def add_dependencies(self, crates):
-        for crate in crates:
-            if "==" in crate:
-                sep_idx = crate.index("==")
-                self.dependencies[crate[:sep_idx]] = crate[sep_idx + 2 :]
-            else:
-                self.dependencies[crate] = "*"
+    def add_dependencies(self, args):
+        cmd = ["cargo", "add"] + args
+        subprocess.run(cmd, cwd=self.template_path, check=True)
+
+    def rm_dependencies(self, args):
+        cmd = ["cargo", "rm"] + args
+        subprocess.run(cmd, cwd=self.template_path, check=True)
+
+    def show_dependencies(self):
+        with open(self.template_path / "Cargo.toml") as f:
+            manifest = toml.load(f)
+
+        print(toml.dumps(manifest["dependencies"]))
 
     def clean(self, cargo):
         wheels = (self.root / "target/wheels").glob("*.whl")
@@ -234,41 +268,42 @@ require(['notebook/js/codecell'], function(codecell) {
         except SystemExit:
             return
 
-        mod_name = f"rustdef_cell_{sha1(bytes(cell, 'utf-8')).hexdigest()}"
+        crate_name = f"rustdef_cell_{sha1(bytes(cell, 'utf-8')).hexdigest()}"
         exported_functions = [
-            fn for fns in self.add_src(mod_name, cell).values() for fn in fns
+            fn for fns in self.add_src(crate_name, cell).values() for fn in fns
         ]
 
-        new_mod_names = self.mod_names + [mod_name]
-        self.update_workspace(new_mod_names)
+        self.add_workspace_member(crate_name)
 
-        if args.force_rebuild or not self.exists_wheel(mod_name):
+        if args.force_rebuild or not self.exists_wheel(crate_name):
             print("Building..")
-            self.build(mod_name, args.release)
+            self.build(crate_name, args.release)
         else:
             print("Use previous build")
 
-        with self.installed(mod_name):
+        with self.installed(crate_name):
             functions = ",".join(exported_functions)
-            exec_line = f"from {mod_name} import {functions}"
+            exec_line = f"from {crate_name} import {functions}"
             ls = {}
             gs = {}
             exec(exec_line, gs, ls)
             self.ipython.push({fn: wrap(ls[fn]) for fn in exported_functions})
-            self.mod_names = new_mod_names
 
-    def add_src(self, mod_name, src):
+    def add_src(self, crate_name, src):
         functions = {
             "pyfn": get_function_names_with_attribute(src, "pyfn"),
-            "pyfunction": get_function_names_with_attribute(src, "pyfunction")
+            "pyfunction": get_function_names_with_attribute(src, "pyfunction"),
         }
 
-        package_root = self.root / mod_name
-        package_root.mkdir(exist_ok=True)
-        (package_root / "Cargo.toml").write_text(
-            self.cargo_tpl.format(mod_name, toml.dumps(self.dependencies), __version__)
-        )
-        (package_root / "src").mkdir(exist_ok=True)
+        crate_root = self.root / crate_name
+        crate_root.mkdir(exist_ok=True)
+
+        manifest = toml.load(self.template_path / "Cargo.toml")
+        manifest["package"]["name"] = crate_name
+        with open(crate_root / "Cargo.toml", "w") as f:
+            toml.dump(manifest, f)
+
+        (crate_root / "src").mkdir(exist_ok=True)
 
         register_function = "\n".join(
             [
@@ -277,17 +312,22 @@ require(['notebook/js/codecell'], function(codecell) {
             ]
         )
 
-        src = self.lib_tpl.format(mod_name, src, register_function)
-        (package_root / "src/lib.rs").write_text(src)
+        src = self.lib_tpl.format(crate_name, src, register_function)
+        (crate_root / "src/lib.rs").write_text(src)
 
         return functions
 
-    def update_workspace(self, mod_names):
-        (self.root / "Cargo.toml").write_text(
-            self.workspace_tpl.format(
-                "[" + ",".join([f'"{p}"' for p in mod_names]) + "]"
-            )
-        )
+    def add_workspace_member(self, crate):
+
+        workspace_manifest = {"workspace": {"members": []}}
+        if (self.root / "Cargo.toml").exists():
+            with open(self.root / "Cargo.toml", "r") as f:
+                workspace_manifest = toml.load(f)
+
+        workspace_manifest["workspace"]["members"].append(crate)
+
+        with open(self.root / "Cargo.toml", "w") as f:
+            toml.dump(workspace_manifest, f)
 
     def exists_wheel(self, mod_name):
         wheel = list(self.root.glob(f"target/wheels/*{mod_name}*.whl"))
@@ -298,7 +338,7 @@ require(['notebook/js/codecell'], function(codecell) {
         os.chdir(self.root / mod_name)
         opts = [
             "--manylinux",
-            "2014",
+            "off",
             "--interpreter",
             sys.executable,
         ]
