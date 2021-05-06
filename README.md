@@ -28,14 +28,9 @@ This extension is built on [PyO3](https://github.com/PyO3/pyo3) and
 $ pip install rustdef
 ```
 
-## Magic command
+## Usage
 
-Add dependencies
-```
-%rustdef depends CRATE...
-```
-
-Define rust functions
+Define rust functions,
 ```rust
 %%rustdef
 #[pyfunction]
@@ -44,6 +39,29 @@ fn my_func(x: i64, y: &str) -> i64 {
     x + y.len() as i64
 }
 ```
+
+Add dependencies, (e.g. `num` crate)
+```
+%rustdef deps add num@0.4.0
+```
+
+Defined dependencies are valid only in the current notebook.
+
+Show dependencies,
+```
+%rustdef deps show
+```
+
+```
+num = "0.4.0"
+
+[pyo3]
+version = "0.13.2"
+features = [ "extension-module",]
+```
+
+`pyo3` is included by default.
+
 ## Develop
 
 ### How it works?
@@ -69,9 +87,7 @@ $ pip install target/wheels/rustdef-{version}-{python}-{platform}.whl
 
 ### ToDo
 
-- [ ] path dependencies
 - [ ] execute within rustdef cell
-- [ ] specify dependency crate version
 - [ ] class/module supports
 - [ ] customizable module name
 - [ ] use functions defined in another cell
