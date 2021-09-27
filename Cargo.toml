@@ -16,7 +16,7 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 quote = "1.0.9"
 zip = "0.5.13"
-syn = { version = "1.0.72", features = ["full"] }
+syn = { version = "1.0.77", features = ["full"] }
 pyo3 = { version = "0.13.2", features = ["extension-module"] }  # version corresponds to numpy
 
 [package.metadata.maturin]
