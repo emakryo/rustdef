@@ -5,7 +5,7 @@ build-backend = "maturin"
 [package.metadata.maturin]
 requires-dist = [
     "jupyter",
-    "pip>=19.3"
+    "pip>=21.1"
 ]
 
 # Poetry is used for development
@@ -17,7 +17,7 @@ authors = ["Ryosuke Kamesawa <emak.ryo@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
-pip = "^19.3"
+pip = "^21.1"
 jupyter = "^1.0.0"
 maturin = "^0.8.3"
 numpy = "^1.19.4"
