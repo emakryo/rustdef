@@ -44,7 +44,16 @@ jobs:
         # targets: # optional, default is
     - name: Install build dependencies
       run: pip install maturin jupyter numpy flake8
-    - name: Install runtime dependencies
+    - name: Cache cargo-edit
+      uses: actions/cache@v2
+      id: cache-cargo-edit
+      with:
+        key: cargo-edit-${{ matrix.os }}
+        path: |
+          ~/.cargo/bin/cargo-add
+          ~/.cargo/bin/cargo-rm
+    - name: Install cargo-edit
+      if: steps.cache-cargo-edit.outputs.cache-hit != 'true'
       run: cargo install cargo-edit
     - name: Python syntax check
       run: flake8
@@ -112,7 +121,16 @@ jobs:
       run: pip install wheels/rustdef-*${{ matrix.python-name }}*.whl
     - name: Install additional dependencies
       run: pip install numpy
+    - name: Cache cargo-edit
+      uses: actions/cache@v2
+      id: cache-cargo-edit
+      with:
+        key: cargo-edit-${{ matrix.os }}
+        path: |
+          ~/.cargo/bin/cargo-add
+          ~/.cargo/bin/cargo-rm
     - name: Install cargo-edit
+      if: steps.cache-cargo-edit.outputs.cache-hit != 'true'
       run: cargo install cargo-edit
     - uses: actions/checkout@v2
     - name: Execute examples
