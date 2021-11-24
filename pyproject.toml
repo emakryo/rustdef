@@ -11,7 +11,7 @@ requires-dist = [
 # Poetry is used for development
 [tool.poetry]
 name = "rustdef"
-version = "0.2.0"
+version = "0.3.0"
 description = ""
 authors = ["Ryosuke Kamesawa <emak.ryo@gmail.com>"]
 
