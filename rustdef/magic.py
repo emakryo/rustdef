@@ -206,7 +206,7 @@ require(['notebook/js/codecell'], function(codecell) {
             f.write("\n" "[lib]\n" 'crate-type = ["cdylib"]\n\n')
 
         # numpy compatible version
-        pyo3 = ["pyo3@0.15.0", "--features", "extension-module"]
+        pyo3 = ["pyo3@0.15.1", "--features", "extension-module"]
         try:
             self.add_dependencies(pyo3)
         except subprocess.CalledProcessError as e:

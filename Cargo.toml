@@ -1,6 +1,6 @@
 [package]
 name = "rustdef"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Ryosuke Kamesawa <emak.ryo@gmail.com>"]
 edition = "2018"
 
@@ -9,9 +9,6 @@ edition = "2018"
 name = "rustdef"
 crate-type = ["cdylib", "rlib"]
 
-# [build-dependencies]
-# glob = "0.3.0"
-# zip = "0.5.11"
 
 [dependencies]
 quote = "1.0.10"

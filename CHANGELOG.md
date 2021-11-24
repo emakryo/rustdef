@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Use stable rust
 
+## [0.3.0] 2021-11-24
+
+### Changed
+- Add subcommands (`add`/`rm`/`show`) to edit dependencies.
+- Remove `depdends` subcommand.
+- Update cargo dependencies.
+- Update pyo3 to 0.15.
+
 ## [0.2.0] 2021-01-03
 
 ### Changed
