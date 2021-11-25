@@ -1,19 +1,45 @@
 [build-system]
-requires = ["maturin"]
+requires = ["maturin>=0.12,<0.13"]
 build-backend = "maturin"
 
-[package.metadata.maturin]
-requires-dist = [
-    "jupyter",
-    "pip>=21.1"
+[project]
+name = "rustdef"
+description = "Jupyter extension which executes Rust functions in Python"
+readme = "README.md"
+license = { text = "MIT" }
+keywords = ["Jupyter notebook", "Rust", "Jupyter extension"]
+requires-dist = ["maturin", "jupyter"]
+classifiers = [
+    "Framework :: Jupyter",
+    "Framework :: IPython",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Rust",
 ]
+requires-python = ">=3.6"
+dependencies = [
+    "jupyter",
+    "pip",
+    "toml>=0.10",
+    "maturin>=0.12",
+]
+authors = [
+    { email = "emak.ryo@gmail.com", name = "Ryosuke Kamesawa" }
+]
+
+[project.urls]
+homepage = "https://github.com/emakryo/rustdef"
+
 
 # Poetry is used for development
 [tool.poetry]
 name = "rustdef"
 version = "0.3.0"
 description = ""
-authors = ["Ryosuke Kamesawa <emak.ryo@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
@@ -21,5 +47,3 @@ pip = "^21.1"
 jupyter = "^1.0.0"
 maturin = "^0.8.3"
 numpy = "^1.19.4"
-
-[tool.poetry.dev-dependencies]
