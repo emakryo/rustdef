@@ -1,6 +1,6 @@
 [package]
 name = "rustdef"
-version = "0.3.0"
+version = "0.3.1-rc"
 authors = ["Ryosuke Kamesawa <emak.ryo@gmail.com>"]
 edition = "2018"
 
@@ -15,19 +15,3 @@ quote = "1.0.10"
 zip = "0.5.13"
 syn = { version = "1.0.81", features = ["full"] }
 pyo3 = { version = "0.15.1", features = ["extension-module"] }  # version corresponds to numpy
-
-[package.metadata.maturin]
-requires-dist = ["maturin", "jupyter"]
-classifier = [
-    "Framework :: Jupyter",
-    "Framework :: IPython",
-    "Operating System :: MacOS",
-    "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Rust",
-]
-requires-python = ">=3.6"
-requires-external = ["rust"]
-project-url = { Github = "https://github.com/emakryo/rustdef" }
