@@ -6,7 +6,7 @@ build-backend = "maturin"
 name = "rustdef"
 description = "Jupyter extension which executes Rust functions in Python"
 readme = "README.md"
-license = { file = "LICENSE" }
+license = { text = "MIT" }
 keywords = ["Jupyter notebook", "Rust", "Jupyter extension"]
 requires-dist = ["maturin", "jupyter"]
 classifiers = [
@@ -21,7 +21,6 @@ classifiers = [
     "Programming Language :: Rust",
 ]
 requires-python = ">=3.6"
-project-url = { Github = "https://github.com/emakryo/rustdef" }
 dependencies = [
     "jupyter",
     "pip",
@@ -31,6 +30,10 @@ dependencies = [
 authors = [
     { email = "emak.ryo@gmail.com", name = "Ryosuke Kamesawa" }
 ]
+
+[project.urls]
+homepage = "https://github.com/emakryo/rustdef"
+
 
 # Poetry is used for development
 [tool.poetry]
