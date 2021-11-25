@@ -13,7 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 ### Security
 
-- Use stable rust
+## [0.3.1] 2021-11-26
+
+### Fixed
+- Fix package metadata
 
 ## [0.3.0] 2021-11-24
 
@@ -22,6 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Remove `depdends` subcommand.
 - Update cargo dependencies.
 - Update pyo3 to 0.15.
+- Use stable rust
 
 ## [0.2.0] 2021-01-03
 
