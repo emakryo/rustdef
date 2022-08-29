@@ -14,4 +14,4 @@ crate-type = ["cdylib", "rlib"]
 quote = "1.0.10"
 zip = "0.5.13"
 syn = { version = "1.0.86", features = ["full"] }
-pyo3 = { version = "0.15.1", features = ["extension-module"] }  # version corresponds to numpy
+pyo3 = { version = "0.17.1", features = ["extension-module"] }  # version corresponds to numpy
