@@ -3,7 +3,7 @@
 [![Test](https://github.com/emakryo/rustdef/workflows/Test/badge.svg?branch=master)](https://github.com/emakryo/rustdef/actions?query=branch%3Amaster)
 [![PyPI version](https://badge.fury.io/py/rustdef.svg)](https://badge.fury.io/py/rustdef)
 
-Jupyter extension for jupyter notebook and rust user.
+Jupyter extension for jupyter notebooks and rust users.
 
 You can define functions in rust and run them as python functions.
 This extension is built on [PyO3](https://github.com/PyO3/pyo3) and
@@ -17,7 +17,7 @@ This extension is built on [PyO3](https://github.com/PyO3/pyo3) and
 
 ## Prerequisite
 
-- Python >= 3.6 and pip >= 19.3
+- Python >= 3.7 and pip >= 19.3
 - [Jupyter notebook](https://jupyter.org/install.html)
 - [Rust](https://www.rust-lang.org/tools/install)
 - [cargo-edit](https://crates.io/crates/cargo-edit)
@@ -64,16 +64,16 @@ features = [ "extension-module",]
 
 ## Develop
 
-### How it works?
+### How does it work?
 
 Roughly, definitions in rustdef are available in python after the following steps.
 
-1. Each rustdef magic cell is populated with module definition of pyo3
+1. Each rustdef magic cell is populated with the module definition of pyo3
 2. A new crate is generated for the rustdef cell
 3. The crate is compiled into a python wheel by `maturin`
-4. Install the wheel with pip
-5. Functions with `#[pyfunction]` attributes are exported into interpreter name space in notebook
-6. Ready to call the function in notebook!
+4. Install the wheel with `pip`
+5. Functions with `#[pyfunction]` attributes are exported into the interpreter namespace in notebooks
+6. Ready to call the function in notebooks!
 
 ### Build
 
