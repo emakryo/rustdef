@@ -12,16 +12,18 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python: [3.6, 3.7, 3.8, 3.9]
+        python: ["3.7", "3.8", "3.9", "3.10", "3.11"]
         include:
-          - python: 3.6
-            python-name: cp36
-          - python: 3.7
+          - python: "3.7"
             python-name: cp37
-          - python: 3.8
+          - python: "3.8"
             python-name: cp38
-          - python: 3.9
+          - python: "3.9"
             python-name: cp39
+          - python: "3.10"
+            python-name: cp310
+          - python: "3.11"
+            python-name: cp311
 
     steps:
       - uses: actions/checkout@v2
@@ -60,7 +62,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-name: [cp36, cp37, cp38, cp39]
+        python-name: [cp37, cp38, cp39, cp310, cp311]
 
     needs: build
     steps:

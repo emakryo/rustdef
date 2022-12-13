@@ -1,6 +1,6 @@
 [package]
 name = "rustdef"
-version = "0.3.1"
+version = "0.4.0"
 authors = ["Ryosuke Kamesawa <emak.ryo@gmail.com>"]
 edition = "2018"
 

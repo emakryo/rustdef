@@ -39,7 +39,7 @@ homepage = "https://github.com/emakryo/rustdef"
 # Poetry is used for development
 [tool.poetry]
 name = "rustdef"
-version = "0.3.0"
+version = "0.4.0"
 description = ""
 
 [tool.poetry.dependencies]
