@@ -12,6 +12,6 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 quote = "1.0.10"
-zip = "0.5.13"
+zip = "0.6.4"
 syn = { version = "1.0.86", features = ["full"] }
 pyo3 = { version = "0.17.3", features = ["extension-module"] }
